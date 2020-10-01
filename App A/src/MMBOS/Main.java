@@ -1,9 +1,9 @@
 package MMBOS;
 
 public class Main {
+    public static String menuFormater = "%-10s %-25s\n";
     public static void main(String[] args) {
 	// Skapa huvudmeny
-        String menuFormater = "%-10s %-25s\n";
         System.out.println("       M & M Bank of Sweden       ");
         System.out.format("%34s\n","----------------------------------");
         System.out.format(menuFormater,"[1]", "Skapa konto");
