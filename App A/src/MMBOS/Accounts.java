@@ -1,9 +1,9 @@
 package MMBOS;
 
 public class Accounts {
-    int accountNumber;
-    String personalID;
-    double cashInAccount;
+    public int accountNumber;
+    public String personalID;
+    public double cashInAccount;
 
     public Accounts(int accountNumber, String personalID, double cashInAccount) {
         this.accountNumber = accountNumber;
