@@ -145,7 +145,9 @@ public class Main {
         }
         checkedHashResult = blockChecker.get(blockChecker.size()-1).hash;
         if (savedHash.equals(checkedHashResult)){
-            System.out.println("Hashcheck stämmer");
+            System.out.println("Hashdata för alla överföringar stämmer!");
+        } else {
+            System.out.println("Hashdata för alla överföringar är korrupt!");
         }
     }
     private static void standardHash() throws FileNotFoundException {

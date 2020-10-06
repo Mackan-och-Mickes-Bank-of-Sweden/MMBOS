@@ -1,0 +1,25 @@
+
+.DS_Store
+App A/.DS_Store
+App A/.idea/App A.iml
+App A/.idea/encodings.xml
+App A/.idea/inspectionProfiles/Project_Default.xml
+App A/.idea/misc.xml
+App A/.idea/modules.xml
+App A/.idea/vcs.xml
+App A/.idea/workspace.xml
+App A/src/MMBOS/.DS_Store
+App A/out/production/App A/MMBOS/StringUtil.class
+App A/out/production/App A/MMBOS/Main.class
+App A/out/production/App A/MMBOS/logs/transfers.log
+App A/out/production/App A/MMBOS/logs/hashtory.log
+App A/out/production/App A/MMBOS/files/pendingpayments.pay
+App A/out/production/App A/MMBOS/files/nextaccountnumber.acc
+App A/out/production/App A/MMBOS/files/customers.cus
+App A/out/production/App A/MMBOS/files/accounts.acc
+App A/out/production/App A/MMBOS/Customers.class
+App A/out/production/App A/MMBOS/BlockCheck.class
+App A/out/production/App A/MMBOS/Block.class
+App A/out/production/App A/MMBOS/Accounts.class
+App A/src/MMBOS/.DS_Store
+App A/src/MMBOS/.DS_Store
