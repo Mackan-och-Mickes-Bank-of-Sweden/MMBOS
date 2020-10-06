@@ -11,7 +11,9 @@
 package MMBOS;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -25,14 +27,17 @@ public class Main {
     public static File accountsFile = new File("src/MMBOS/files/accounts.acc");
     public static File pendingPaymentsFile = new File("src/MMBOS/files/pendingpayments.pay");
     public static File nextAccountNumber = new File("src/MMBOS/files/nextaccountnumber.acc");
+    public static File transferHistoryFile = new File("src/MMBOS/logs/transfers.log");
+    public static File hashHistoryFile = new File("src/MMBOS/logs/hashtory.log");
     public static int nextAccountNumb;
     public static String newAccountNumber;
     public static ArrayList <Customers> customersList = new ArrayList<>();
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
-    public static ArrayList<Block> blockchain = new ArrayList<Block>(); //BlockChain...
+    public static ArrayList<Block> blockchain = new ArrayList<>(); //BlockChain...
     public static int numOfZerosInHash = 3;
+    public static ArrayList <BlockCheck> blockChecker = new ArrayList<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
         checkForFiles();
         fetchCustomers();
@@ -44,22 +49,6 @@ public class Main {
 
 // TODO: Skapa kund
             if (headMenuChoice.equals("1")) {
-
-                blockchain.add(new Block("20201;20202;15000", "0"));
-                System.out.println("Hash av block 1 ... ");
-                blockchain.get(0).mineBlock(numOfZerosInHash);
-                blockchain.add(new Block("20204;20205;20000",blockchain.get(blockchain.size()-1).hash));
-                System.out.println("Hash av block 2 ... ");
-                blockchain.get(1).mineBlock(numOfZerosInHash);
-                blockchain.add(new Block("20280;20201;10000",blockchain.get(blockchain.size()-1).hash));
-                System.out.println("Hash av block 3 ... ");
-                blockchain.get(2).mineBlock(numOfZerosInHash);
-
-                System.out.println("\nBlockchain är giltig: " + isChainValid());
-
-                String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-                System.out.println("\nThe block chain: ");
-                System.out.println(blockchainJson);
 
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
@@ -80,12 +69,7 @@ public class Main {
 
 // Menyval 2 : Lista alla kunder
             if (headMenuChoice.equals("3")) {
-                String customerFormat = "%-15s %-25s\n";
-                System.out.println("\nListar alla bankens kunder");
-                System.out.format(customerFormat, "Personnummer", "Namn");
-                for (int i=0; i<customersList.size(); i++) {
-                    System.out.format(customerFormat, customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
-                }
+                listCustomers();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -94,7 +78,7 @@ public class Main {
             if (headMenuChoice.equals("4")) {
                 String accountFormat = "%-15s %10.2f\n";
                 System.out.println("\nListar alla konton på banken");
-                System.out.format("%-15s %10s\n", "Kontonummer", "Belopp");
+                System.out.format("%-15s %10s\n", "KONTO", "SALDO");
                 for (int i=0; i<accountsList.size(); i++) {
                     System.out.format(accountFormat, String.valueOf(accountsList.get(i).accountNumber).substring(0,4) +" "+ String.valueOf(accountsList.get(i).accountNumber).substring(4,6)+" "+String.valueOf(accountsList.get(i).accountNumber).substring(6), accountsList.get(i).cashInAccount);
                 }
@@ -104,7 +88,7 @@ public class Main {
 
 // TODO: Insättningar
             if (headMenuChoice.equals("5")) {
-                updNextAccountNumberFile();
+
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -137,6 +121,62 @@ public class Main {
                 String keyPress = keyBoard.nextLine();
             }
 
+            if (headMenuChoice.equals("10")) {
+                checkTransferHash();
+
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
+            }
+        }
+    }
+
+    private static void checkTransferHash() throws FileNotFoundException {
+        Scanner checkTransfersFile = new Scanner(transferHistoryFile);
+        Scanner checkHashtoryFile = new Scanner(hashHistoryFile);
+        String savedHash="";
+        String checkedHashResult;
+
+        while (checkTransfersFile.hasNextLine()) {
+            String rowsFromFile = checkTransfersFile.nextLine();
+            String rowsFromHashtory = checkHashtoryFile.nextLine();
+            String[] readerHashParts = rowsFromHashtory.split(";");
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2],readerHashParts[3]));
+            savedHash = readerHashParts[0];
+        }
+        checkedHashResult = blockChecker.get(blockChecker.size()-1).hash;
+        if (savedHash.equals(checkedHashResult)){
+            System.out.println("Hashcheck stämmer");
+        }
+    }
+    private static void standardHash() throws FileNotFoundException {
+        Scanner checkTransfersFile = new Scanner(transferHistoryFile);
+        String previousHash;
+        int i = 0;
+        while (checkTransfersFile.hasNextLine()) {
+            try {
+                previousHash = blockchain.get(blockchain.size() - 1).hash;
+
+            } catch (Exception e) {
+                previousHash = "0";
+            }
+            String rowsFromFile = checkTransfersFile.nextLine();
+            blockchain.add(new Block(rowsFromFile, previousHash));
+            System.out.println("Hash av block "+i+" . . .");
+            blockchain.get(i).mineBlock(numOfZerosInHash);
+            i++;
+        }
+        System.out.println("\nBlockchain är giltig: " + isChainValid());
+
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+        System.out.println("\nThe block chain: ");
+        System.out.println(blockchainJson);
+    }
+    private static void listCustomers() {
+        String customerFormat = "%-5s %-20s %-25s\n";
+        System.out.println("\nListar alla bankens kunder");
+        System.out.format(customerFormat, "POS", "PERSONNUMMER", "KUND");
+        for (int i=0; i<customersList.size(); i++) {
+            System.out.format(customerFormat, i, customersList.get(i).getPersonalID().substring(0,8)+"-"+customersList.get(i).getPersonalID().substring(8), customersList.get(i).firstName + " " + customersList.get(i).lastName);
         }
     }
 
@@ -147,7 +187,11 @@ public class Main {
             randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
         }
         newAccountNumber = nextAccountNumb + randomAccount;
-        Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), "8007035531", 0);
+        listCustomers();
+        // TODO: Lista med id och tilldela personnummer till nytt konto.
+        System.out.print("\nAnge POS som kontot skall tilldelas: ");
+        String customerID = keyBoard.nextLine();
+        Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(Integer.parseInt(customerID)).getPersonalID(), 0);
         accountsList.add(addAccount);
 
     }
@@ -246,7 +290,7 @@ public class Main {
             if (fileReader.hasNextLine()) {
                 nextAccountNumb = Integer.parseInt(fileReader.nextLine());
             } else {
-                nextAccountNumb = 140337; // Första unika kontonumret.
+                nextAccountNumb = 140337; // Första unika kontonummerserien.
             }
         } catch (Exception e) {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
@@ -281,5 +325,6 @@ public class Main {
         }
         return true;
     }
+
 
 }
