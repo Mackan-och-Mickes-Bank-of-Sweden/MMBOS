@@ -8,6 +8,13 @@
 
  */
 
+/*
+ *      transfers.log           från konto; till konto; belopp; meddelande/ocr
+ *      hashtory.log            kontrollhash av alla överföringar
+ *      pendingpayments.pay     från konto; till konto; belopp; datum; meddelande/ocr
+ *
+ */
+
 package MMBOS;
 
 import java.io.File;
@@ -123,7 +130,7 @@ public class Main {
 
             if (headMenuChoice.equals("10")) {
                 checkTransferHash();
-
+                //saveTransferData();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -133,24 +140,18 @@ public class Main {
     private static void checkTransferHash() throws FileNotFoundException {
         Scanner checkTransfersFile = new Scanner(transferHistoryFile);
         Scanner checkHashtoryFile = new Scanner(hashHistoryFile);
-        String savedHash="";
-        String checkedHashResult;
 
         while (checkTransfersFile.hasNextLine()) {
             String rowsFromFile = checkTransfersFile.nextLine();
             String rowsFromHashtory = checkHashtoryFile.nextLine();
             String[] readerHashParts = rowsFromHashtory.split(";");
             blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2],readerHashParts[3]));
-            savedHash = readerHashParts[0];
         }
-        checkedHashResult = blockChecker.get(blockChecker.size()-1).hash;
-        if (savedHash.equals(checkedHashResult)){
-            System.out.println("Hashdata för alla överföringar stämmer!");
-        } else {
-            System.out.println("Hashdata för alla överföringar är korrupt!");
-        }
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
+        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
     }
-    private static void standardHash() throws FileNotFoundException {
+
+    private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
         Scanner checkTransfersFile = new Scanner(transferHistoryFile);
         String previousHash;
         int i = 0;
@@ -173,6 +174,7 @@ public class Main {
         System.out.println("\nThe block chain: ");
         System.out.println(blockchainJson);
     }
+
     private static void listCustomers() {
         String customerFormat = "%-5s %-20s %-25s\n";
         System.out.println("\nListar alla bankens kunder");
@@ -202,7 +204,7 @@ public class Main {
         try {
             FileWriter writeToFile = new FileWriter(accountsFile);
             for (int i=0; i < accountsList.size(); i++) {
-                writeToFile.write(accountsList.get(i).accountNumber + ";" + accountsList.get(i).personalID + ";" + accountsList.get(i).cashInAccount + "\n");
+                writeToFile.write(accountsList.get(i).accountNumber + ";" + accountsList.get(i).getPersonalID() + ";" + accountsList.get(i).cashInAccount + "\n");
             }
             writeToFile.close();
             return true;
@@ -275,6 +277,7 @@ public class Main {
     }
 
     private static void checkForFiles() {
+
         try {
             if (!customersFile.exists()) {
                 customersFile.createNewFile();
@@ -301,31 +304,37 @@ public class Main {
     }
 
     public static Boolean isChainValid() {
-        Block currentBlock;
-        Block previousBlock;
+        BlockCheck currentBlock;
+        BlockCheck previousBlock;
         String hashTarget = new String(new char[numOfZerosInHash]).replace('\0', '0');
+        int fail = 0;
+        for(int i=1; i < blockChecker.size(); i++) {
+            currentBlock = blockChecker.get(i);
+            previousBlock = blockChecker.get(i-1);
 
-        //loop through blockchain to check hashes:
-        for(int i=1; i < blockchain.size(); i++) {
-            currentBlock = blockchain.get(i);
-            previousBlock = blockchain.get(i-1);
-            //compare registered hash and calculated hash:
-            if(!currentBlock.hash.equals(currentBlock.calculateHash()) ){
-                System.out.println("Nuvarande hash är korrupt.");
-                return false;
+            if(!currentBlock.hash.equals(currentBlock.calculateHashChecker()) ){
+                System.out.println("\nDenna hash är korrupt.");
+                System.out.println("Följande data finns registrerat för detta block:\n"+ blockChecker.get(i).getData());
+                //return false;
+                fail = 1;
             }
-            //compare previous hash and registered previous hash
             if(!previousBlock.hash.equals(currentBlock.previousHash) ) {
-                System.out.println("Föregåene hash är korrupt.");
-                return false;
+                System.out.println("\nFöregåene hash är korrupt.");
+                System.out.println("Följande data finns registrerat för detta block:\n"+ blockChecker.get(i-1).getData());
+                //return false;
+                fail = 1;
             }
-            //check if hash is solved
-            if(!currentBlock.hash.substring( 0, numOfZerosInHash).equals(hashTarget)) {
-                System.out.println("Detta block har inte hämtats.");
-                return false;
-            }
+//            if(!currentBlock.hash.substring( 0, numOfZerosInHash).equals(hashTarget)) {
+//                System.out.println("Detta block har inte korrekt start på hash.");
+//                //return false;
+//                fail = 1;
+//            }
         }
-        return true;
+        if (fail==0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

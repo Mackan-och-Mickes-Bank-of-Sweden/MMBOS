@@ -1,5 +1,10 @@
 package MMBOS;
-
+/**
+ * Kontrollerar loggade hashar med alla överföringas-hashar
+ *
+ * @author Michael
+ *
+ */
 public class BlockCheck {
 
     public String hash;
@@ -24,5 +29,9 @@ public class BlockCheck {
                         data
         );
         return calculatedhashCheck;
+    }
+
+    public String getData() {
+        return data;
     }
 }
