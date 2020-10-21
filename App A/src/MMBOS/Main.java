@@ -30,12 +30,12 @@ public class Main {
 // Globala variabler
     public static String menuFormater = "%-10s %-25s\n";
     public static Scanner keyBoard = new Scanner(System.in);
-    public static File customersFile = new File("src/MMBOS/files/customers.cus");
-    public static File accountsFile = new File("src/MMBOS/files/accounts.acc");
-    public static File pendingPaymentsFile = new File("src/MMBOS/files/pendingpayments.pay");
-    public static File nextAccountNumber = new File("src/MMBOS/files/nextaccountnumber.acc");
-    public static File transferHistoryFile = new File("src/MMBOS/logs/transfers.log");
-    public static File hashHistoryFile = new File("src/MMBOS/logs/hashtory.log");
+    public static File customersFile = new File("../files/customers.cus");
+    public static File accountsFile = new File("../files/accounts.acc");
+    public static File pendingPaymentsFile = new File("../files/pendingpayments.pay");
+    public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
+    public static File transferHistoryFile = new File("../logs/transfers.log");
+    public static File hashHistoryFile = new File("../logs/hashtory.log");
     public static int nextAccountNumb;
     public static String newAccountNumber;
     public static ArrayList <Customers> customersList = new ArrayList<>();
