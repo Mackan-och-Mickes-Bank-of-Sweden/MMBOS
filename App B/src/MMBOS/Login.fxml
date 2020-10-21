@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.layout.StackPane?>
 
 <StackPane fx:id="Login" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MMBOS.LoginController">
     <children>
@@ -13,10 +11,11 @@
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="193.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="161.0" minWidth="10.0" prefWidth="107.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="381.0" />
-            <ColumnConstraints />
-            <ColumnConstraints />
-            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="254.0" />
+            <ColumnConstraints maxWidth="167.0" minWidth="0.0" prefWidth="85.0" />
+            <ColumnConstraints maxWidth="65.0" minWidth="0.0" prefWidth="65.0" />
+            <ColumnConstraints maxWidth="100.0" minWidth="8.0" prefWidth="47.0" />
+            <ColumnConstraints maxWidth="100.0" minWidth="10.0" prefWidth="54.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="174.0" minHeight="10.0" prefHeight="114.0" vgrow="SOMETIMES" />
@@ -34,12 +33,12 @@
               </ImageView>
               <Label text="Logga in med dina uppgifter" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowSpan="2" GridPane.valignment="BOTTOM">
                   <font>
-                      <Font size="26.0" />
+                      <Font size="18.0" />
                   </font>
               </Label>
               <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonClicked" text="Logga in" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+             <TextField fx:id="personalIDField" prefHeight="27.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
               <PasswordField fx:id="passwordField" prefHeight="27.0" prefWidth="146.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-              <TextField fx:id="personalIDField" GridPane.columnIndex="2" GridPane.rowIndex="2" />
               <Label contentDisplay="RIGHT" prefHeight="17.0" prefWidth="188.0" text="Lösenord:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
               <Label contentDisplay="RIGHT" prefHeight="17.0" prefWidth="193.0" text="Personnummer:" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
          </children>

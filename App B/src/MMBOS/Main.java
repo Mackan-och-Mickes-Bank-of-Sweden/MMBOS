@@ -1,13 +1,17 @@
 package MMBOS;
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class Main extends Application {
@@ -33,8 +37,18 @@ public class Main extends Application {
         mainController.main = this;
         Scene mainScene = new Scene(rootSecond, 800, 400);
         mapScenes.put("mainScene", mainScene);
-        //loginController.mainC = mainController;
 
+        setGlobalEventHandler(rootFirst);
+
+    }
+
+    private void setGlobalEventHandler(Node root) {
+        root.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+            if (ev.getCode() == KeyCode.ENTER) {
+                LoginController.lc.loginButton.fire();
+                ev.consume();
+            }
+        });
     }
 
     public static void main(String[] args) {

@@ -3,8 +3,8 @@ package MMBOS;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,11 +14,12 @@ public class MainController {
     public MainController(){
         mc = this;
     }
+    public static MainController mc;
+    Main main;
+
     public static File accountsFile = new File("../files/accounts.acc");
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
     public static String loggedinID;
-    Main main=null;
-    public static MainController mc = null;
 
     @FXML
     private Label loggedinText;
@@ -28,6 +29,12 @@ public class MainController {
 
     @FXML
     public void setLoggedin(String passingInfo) {
+        String path = "src/MMBOS/piano.mp3";
+        Media mp3Startup = null;
+        MediaPlayer mediaPlayer = null;
+        mp3Startup = new Media(new File(path).toURI().toString());
+        mediaPlayer = new MediaPlayer(mp3Startup);
+        mediaPlayer.setAutoPlay(true);
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
@@ -36,7 +43,7 @@ public class MainController {
         for (int i=0; i<accountsList.size(); i++) {
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + "\t Saldo: "
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
                     + accountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
         }
