@@ -1,8 +1,8 @@
 package MMBOS;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -23,18 +23,29 @@ public class MainController {
 
     @FXML
     private Label loggedinText;
-
     @FXML
     private ListView myAccountList;
+    @FXML
+    private ComboBox comboMenu;
+    @FXML
+    private ComboBox fromAccount;
+    @FXML
+    private ComboBox toAccount;
+    @FXML
+    private Label headerText;
+    @FXML
+    private Button doTransferButton;
+    @FXML
+    private TextField transferMessage;
+    @FXML
+    private TextField transferAmount;
+    @FXML
+    private DatePicker datepickerTransfer;
 
     @FXML
-    public void setLoggedin(String passingInfo) {
-        String path = "src/MMBOS/loop.wav";
-        Media mp3Startup = null;
-        MediaPlayer mediaPlayer = null;
-        mp3Startup = new Media(new File(path).toURI().toString());
-        mediaPlayer = new MediaPlayer(mp3Startup);
-        mediaPlayer.setAutoPlay(true);
+    public void setLoggedin(String passingInfo, String name) {
+        showTransfer(false);
+
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
@@ -46,7 +57,17 @@ public class MainController {
                     + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
                     + accountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
+            fromAccount.getItems().add(accountsList.get(i).accountNumber);
+            toAccount.getItems().add(accountsList.get(i).accountNumber);
         }
+        headerText.setText(name+"s konton i banken");
+        comboMenu.getItems().addAll(
+                "Öppna nytt konto",
+                "Insättning till konto",
+                "Uttag från konto",
+                "Gör en överföring mellan egna konton",
+                "Gör en betalning till annans konto"
+        );
     }
 
     public static void fetchAccounts() {
@@ -66,5 +87,22 @@ public class MainController {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
             return;
         }
+    }
+
+    public void comboMenu(ActionEvent actionEvent) {
+       if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
+           showTransfer(true);
+       } else {
+           showTransfer(false);
+       }
+    }
+
+    private void showTransfer(boolean b) {
+        fromAccount.setVisible(b);
+        toAccount.setVisible(b);
+        doTransferButton.setVisible(b);
+        transferMessage.setVisible(b);
+        datepickerTransfer.setVisible(b);
+        transferAmount.setVisible(b);
     }
 }

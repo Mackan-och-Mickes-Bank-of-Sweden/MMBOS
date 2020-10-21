@@ -24,6 +24,7 @@ public class LoginController {
     Main main;
     public static File customersFile = new File("../files/customers.cus");
     public static ArrayList <Customers> customersList = new ArrayList<>();
+    public static String sessionName;
 
     @FXML
     public TextField personalIDField;
@@ -41,18 +42,21 @@ public class LoginController {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Hej " + customersList.get(i).firstName + " " + customersList.get(i).lastName + ", tack för att du logga in!", ButtonType.OK);
                 alert.setTitle("** M M B O S **");
                 alert.setHeaderText("Inloggning till banken");
-                String path2 = "src/MMBOS/startup.mp3";
-                Media mp3Startup2 = null;
-                MediaPlayer mediaPlayer2 = null;
-                mp3Startup2 = new Media(new File(path2).toURI().toString());
-                mediaPlayer2 = new MediaPlayer(mp3Startup2);
-                mediaPlayer2.setAutoPlay(true);
+                playSound("src/MMBOS/startup.mp3");
                 alert.showAndWait();
                 main.appWin.setScene(main.mapScenes.get("mainScene"));
-                MainController.mc.setLoggedin(customersList.get(i).getPersonalID());
+                MainController.mc.setLoggedin(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
                 break;
             }
         }
+    }
+
+    private void playSound(String path) {
+        Media mp3Startup = null;
+        MediaPlayer mediaPlayer = null;
+        mp3Startup = new Media(new File(path).toURI().toString());
+        mediaPlayer = new MediaPlayer(mp3Startup);
+        mediaPlayer.setAutoPlay(true);
     }
 
     private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -10,27 +12,17 @@
          <children>
             <GridPane layoutX="-1.0" layoutY="-1.0" prefHeight="400.0" prefWidth="800.0">
                <children>
-                  <Button fx:id="menuOkButton" mnemonicParsing="false" text="Ok" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-                  <Label text="Mina konton" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <Label fx:id="headerText" text="Mina konton" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
-                        <Font size="26.0" />
+                        <Font size="20.0" />
                      </font>
                   </Label>
-                  <SplitMenuButton fx:id="menuDropDown" mnemonicParsing="false" prefHeight="27.0" prefWidth="208.0" text="Välj " textAlignment="RIGHT" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Öppna nytt konto" />
-                        <MenuItem mnemonicParsing="false" text="Betala räkning" />
-                        <MenuItem mnemonicParsing="false" text="Överföring" />
-                        <MenuItem mnemonicParsing="false" text="Insättning" />
-                        <MenuItem mnemonicParsing="false" text="Uttag" />
-                     </items>
-                  </SplitMenuButton>
-                  <Label fx:id="loggedinText" layoutX="155.0" layoutY="81.0" text="Inloggad" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <Label fx:id="loggedinText" layoutX="155.0" layoutY="81.0" text="Inloggad">
                      <font>
                         <Font name="System Font" size="20.0" />
                      </font>
                   </Label>
-                  <MenuBar fx:id="menuBar" GridPane.columnSpan="5" GridPane.valignment="TOP">
+                  <MenuBar fx:id="menuBar" GridPane.columnSpan="6" GridPane.valignment="TOP">
                      <menus>
                         <Menu mnemonicParsing="false" text="Meny">
                            <items>
@@ -51,21 +43,33 @@
                      </menus>
                   </MenuBar>
                   <ListView fx:id="myAccountList" prefHeight="60.0" prefWidth="239.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="2" />
+                  <ImageView fitHeight="59.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <image>
+                        <Image url="@m_m_b_o_s.png" />
+                     </image>
+                  </ImageView>
+                  <ComboBox fx:id="comboMenu" onAction="#comboMenu" prefHeight="27.0" prefWidth="300.0" promptText="Välj åtgärd" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                  <ComboBox fx:id="fromAccount" prefHeight="27.0" prefWidth="301.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                  <ComboBox fx:id="toAccount" layoutX="448.0" layoutY="197.0" prefHeight="27.0" prefWidth="300.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
+                  <Button fx:id="doTransferButton" mnemonicParsing="false" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                  <TextField fx:id="transferMessage" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                  <DatePicker fx:id="datepickerTransfer" prefHeight="27.0" prefWidth="255.0" promptText="Datum för överföring" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                  <TextField fx:id="transferAmount" prefHeight="27.0" prefWidth="112.0" promptText="Belopp" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="290.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="57.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="222.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="458.0" minWidth="10.0" prefWidth="56.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="192.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="458.0" minWidth="10.0" prefWidth="74.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="93.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="53.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
