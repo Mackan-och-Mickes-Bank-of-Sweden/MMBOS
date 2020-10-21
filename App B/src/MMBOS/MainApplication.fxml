@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MMBOS.MainController">
+   <children>
+      <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="400.0" minWidth="800.0" prefHeight="-1.0" prefWidth="-1.0">
+         <children>
+            <GridPane layoutX="-1.0" layoutY="-1.0" prefHeight="400.0" prefWidth="800.0">
+               <children>
+                  <Button fx:id="menuOkButton" mnemonicParsing="false" text="Ok" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                  <Label text="Mina konton" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="26.0" />
+                     </font>
+                  </Label>
+                  <SplitMenuButton fx:id="menuDropDown" mnemonicParsing="false" text="Välj " textAlignment="RIGHT" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Öppna nytt konto" />
+                        <MenuItem mnemonicParsing="false" text="Betala räkning" />
+                        <MenuItem mnemonicParsing="false" text="Överföring" />
+                        <MenuItem mnemonicParsing="false" text="Insättning" />
+                        <MenuItem mnemonicParsing="false" text="Uttag" />
+                     </items>
+                  </SplitMenuButton>
+                  <Label fx:id="loggedinText" layoutX="155.0" layoutY="81.0" text="Inloggad" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="System Font" size="20.0" />
+                     </font>
+                  </Label>
+                  <MenuBar fx:id="menuBar" GridPane.columnSpan="5" GridPane.valignment="TOP">
+                     <menus>
+                        <Menu mnemonicParsing="false" text="Meny">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Öppna nytt konto" />
+                              <MenuItem mnemonicParsing="false" text="Betala räkning" />
+                              <MenuItem mnemonicParsing="false" text="Överföring" />
+                              <MenuItem mnemonicParsing="false" text="Insättning" />
+                              <MenuItem mnemonicParsing="false" text="Uttag" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem mnemonicParsing="false" text="Logga ut" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Hjälp">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Om  MMBOS" />
+                           </items>
+                        </Menu>
+                     </menus>
+                  </MenuBar>
+                  <ListView fx:id="myAccountList" prefHeight="60.0" prefWidth="239.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="2" />
+               </children>
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="239.0" minWidth="10.0" prefWidth="236.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="141.0" minWidth="10.0" prefWidth="54.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="29.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="291.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+            </GridPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
