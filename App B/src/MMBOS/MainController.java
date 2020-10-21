@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainController {
+    public static MainController mc;
     public MainController(){
         mc = this;
     }
-    public static MainController mc;
     Main main;
 
     public static File accountsFile = new File("../files/accounts.acc");
@@ -29,7 +29,7 @@ public class MainController {
 
     @FXML
     public void setLoggedin(String passingInfo) {
-        String path = "src/MMBOS/piano.mp3";
+        String path = "src/MMBOS/loop.wav";
         Media mp3Startup = null;
         MediaPlayer mediaPlayer = null;
         mp3Startup = new Media(new File(path).toURI().toString());

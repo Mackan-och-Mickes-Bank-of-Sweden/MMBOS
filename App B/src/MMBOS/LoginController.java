@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LoginController {
-    public static LoginController lc = null;
+    public static LoginController lc;
     public LoginController(){
         lc = this;
     }
