@@ -126,8 +126,11 @@ public class MainController {
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
                 + newAccountNumber.substring(6) + " \tSaldo: "
-                + "0kr";
+                + "0.0kr";
         myAccountList.getItems().add(item);
+        fromAccount.getItems().add(newAccountNumber);
+        toAccount.getItems().add(newAccountNumber);
+        fromAccountOther.getItems().add(newAccountNumber);
         saveNewAccountToFile(newAccountNumber, loggedinID,0);
         return true;
     }
