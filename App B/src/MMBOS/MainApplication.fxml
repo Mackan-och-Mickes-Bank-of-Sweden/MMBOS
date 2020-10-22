@@ -9,6 +9,16 @@
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MMBOS.MainController">
    <children>
+      <ImageView fitHeight="400.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@bg.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="177.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_RIGHT">
+         <image>
+            <Image url="@globe2.gif" />
+         </image>
+      </ImageView>
       <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="400.0" minWidth="800.0" prefHeight="-1.0" prefWidth="-1.0">
          <children>
             <GridPane layoutX="-1.0" layoutY="-1.0" prefHeight="400.0" prefWidth="800.0">
@@ -60,7 +70,13 @@
                         <ComboBox fx:id="toAccount" layoutY="35.0" prefHeight="27.0" prefWidth="289.0" promptText="Till konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
                      </children>
                   </Pane>
-                  <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                  <Pane fx:id="groupCreateNewAccount" prefHeight="46.0" prefWidth="288.0" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                     <children>
+                        <Button fx:id="createNewAccountButton" layoutY="21.0" mnemonicParsing="false" onAction="#createNewAccountButtonClicked" text="Skapa ett nytt konto" />
+                        <CheckBox fx:id="checkboxCreateNewAccount" layoutY="67.0" mnemonicParsing="false" text="Jag har läst villkoren för konto" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
                         <Button fx:id="doTransferOtherButton" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" text="Utför" />
                         <TextField fx:id="transferAmountOther" layoutX="178.0" layoutY="81.0" prefHeight="27.0" prefWidth="104.0" promptText="Belopp" />

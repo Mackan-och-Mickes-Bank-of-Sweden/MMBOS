@@ -42,7 +42,7 @@ public class LoginController {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Hej " + customersList.get(i).firstName + " " + customersList.get(i).lastName + ", tack för att du logga in!", ButtonType.OK);
                 alert.setTitle("** M M B O S **");
                 alert.setHeaderText("Inloggning till banken");
-                playSound("src/MMBOS/startup.mp3");
+                //playSound("src/MMBOS/startup.mp3");
                 alert.showAndWait();
                 main.appWin.setScene(main.mapScenes.get("mainScene"));
                 MainController.mc.setLoggedin(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);

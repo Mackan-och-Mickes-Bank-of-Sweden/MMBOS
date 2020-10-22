@@ -1,6 +1,7 @@
 package MMBOS;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
@@ -50,11 +51,18 @@ public class MainController {
     private ComboBox fromAccountOther;
     @FXML
     private MenuItem menuLoggaut;
+    @FXML
+    private Pane groupCreateNewAccount;
+    @FXML
+    private Button createNewAccountButton;
+    @FXML
+    private CheckBox checkboxCreateNewAccount;
 
     @FXML
     public void setLoggedin(String passingInfo, String name) {
         groupTransferOwnAccount.setVisible(false);
         groupTransferOtherAccount.setVisible(false);
+        groupCreateNewAccount.setVisible(false);
 
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
@@ -81,6 +89,14 @@ public class MainController {
         );
     }
 
+    public void createNewAccountButtonClicked (Event e) {
+    if (checkboxCreateNewAccount.isSelected()) {
+
+    } else {
+        Alert alert = new Alert(Alert.AlertType.WARNING, "Du måste ha läst villkoren för kontot och kryssa i rutan!", ButtonType.OK);
+        alert.showAndWait();
+    }
+    }
     public static void fetchAccounts() {
         try {
             Scanner accountsFileReader = new Scanner(accountsFile);
@@ -116,6 +132,11 @@ public class MainController {
            groupTransferOtherAccount.setVisible(true);
        } else {
            groupTransferOtherAccount.setVisible(false);
+       }
+       if (comboMenu.getValue().equals("Öppna nytt konto")) {
+           groupCreateNewAccount.setVisible(true);
+       } else {
+           groupCreateNewAccount.setVisible(false);
        }
     }
 

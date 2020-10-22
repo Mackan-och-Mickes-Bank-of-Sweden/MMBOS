@@ -20,6 +20,8 @@ package MMBOS;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -43,7 +45,7 @@ public class Main {
     public static int numOfZerosInHash = 3;
     public static ArrayList <BlockCheck> blockChecker = new ArrayList<>();
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, NoSuchAlgorithmException {
 
         checkForFiles();
         fetchCustomers();
@@ -53,14 +55,26 @@ public class Main {
             String headMenuChoice = printHeadMenu();
             if (headMenuChoice.equals("0")) break;
 
-// TODO: Skapa kund
+// Menyval 1 : Skapa kund
             if (headMenuChoice.equals("1")) {
-
+                System.out.println("Skapa ny kund");
+                System.out.print("Ange personnummer: ");
+                String inPersonnummer = keyBoard.nextLine();
+                System.out.print("Ange förnamn: ");
+                String inFirstName = keyBoard.nextLine();
+                System.out.print("Ange efternamn: ");
+                String inLastName = keyBoard.nextLine();
+                String inPassword = String.valueOf(md5Pass(inPersonnummer.substring(8)));
+                Customers newCustomer = new Customers(inPersonnummer, inFirstName, inLastName,inPassword);
+                customersList.add(newCustomer);
+                if (saveCustomersToFile()) {
+                    System.out.println("Kunden skapades med lösenordet: " + inPersonnummer.substring(8));
+                }
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
 
-// Menyval 1 : Skapa nytt konto
+// Menyval 2 : Skapa nytt konto
             if (headMenuChoice.equals("2")) {
                 createNewAccount();
                 if(saveAccountsToFile()) {
@@ -73,14 +87,14 @@ public class Main {
                 String keyPress = keyBoard.nextLine();
             }
 
-// Menyval 2 : Lista alla kunder
+// Menyval 3 : Lista alla kunder
             if (headMenuChoice.equals("3")) {
                 listCustomers();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
 
-// Menyval 3 : Lista alla konton
+// Menyval 4 : Lista alla konton
             if (headMenuChoice.equals("4")) {
                 String accountFormat = "%-15s %10.2f\n";
                 System.out.println("\nListar alla konton på banken");
@@ -113,7 +127,7 @@ public class Main {
                 String keyPress = keyBoard.nextLine();
             }
 
-// TODO: Banktillgångar
+// Menyval 8 : Banktillgångar
             if (headMenuChoice.equals("8")) {
                 double totalBankAmount = 0;
                 for (int i=0; i<accountsList.size(); i++) {
@@ -214,6 +228,21 @@ public class Main {
         }
         catch (Exception e) {
             System.out.println("Problem vid skapandet av konto");
+        }
+        return false;
+    }
+
+    private static boolean saveCustomersToFile() {
+        try {
+            FileWriter writeToFile = new FileWriter(customersFile);
+            for (int i=0; i < customersList.size(); i++) {
+                writeToFile.write(customersList.get(i).getPersonalID() + ";" + customersList.get(i).firstName+ ";" + customersList.get(i).lastName + ";" + customersList.get(i).passWd + "\n");
+            }
+            writeToFile.close();
+            return true;
+        }
+        catch (Exception e) {
+            System.out.println("Problem vid skrivning till kundfil.");
         }
         return false;
     }
@@ -341,5 +370,14 @@ public class Main {
         }
     }
 
-
+    private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        md5.update(text.getBytes());
+        byte[] md5Password = md5.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : md5Password) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        return sb;
+    }
 }
