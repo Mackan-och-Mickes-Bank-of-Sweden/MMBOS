@@ -5,6 +5,12 @@ public class Accounts {
     private String personalID;
     public double cashInAccount;
 
+    /**
+     * @author Michael
+     * @param accountNumber
+     * @param personalID
+     * @param cashInAccount
+     */
     public Accounts(long accountNumber, String personalID, double cashInAccount) {
         this.accountNumber = accountNumber;
         this.personalID = personalID;

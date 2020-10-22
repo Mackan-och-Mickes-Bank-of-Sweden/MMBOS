@@ -19,6 +19,7 @@ public class Main extends Application {
     HashMap <String, Scene> mapScenes = new HashMap<>();
     Stage appWin = null;
     @Override
+    
     public void start(Stage appWin) throws Exception{
         this.appWin = appWin;
         appWin.setTitle("** M M B O S **");
@@ -42,6 +43,10 @@ public class Main extends Application {
 
     }
 
+    /**
+     * @author Michael
+     * @param root
+     */
     private void setGlobalEventHandler(Node root) {
         root.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
             if (ev.getCode() == KeyCode.ENTER) {

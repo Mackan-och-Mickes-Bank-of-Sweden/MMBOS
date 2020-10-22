@@ -5,12 +5,9 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -32,41 +29,29 @@ public class MainController {
     public static int nextAccountNumb;
     public static String newAccountNumber;
 
-    @FXML
-    private Label loggedinText;
-    @FXML
-    private ListView myAccountList;
-    @FXML
-    private ComboBox comboMenu;
-    @FXML
-    private ComboBox fromAccount;
-    @FXML
-    private ComboBox toAccount;
-    @FXML
-    private Label headerText;
-    @FXML
-    private Button doTransferButton;
-    @FXML
-    private TextField transferMessage;
-    @FXML
-    private TextField transferAmount;
-    @FXML
-    private DatePicker datepickerTransfer;
-    @FXML
-    private Pane groupTransferOwnAccount;
-    @FXML
-    private Pane groupTransferOtherAccount;
-    @FXML
-    private ComboBox fromAccountOther;
-    @FXML
-    private MenuItem menuLoggaut;
-    @FXML
-    private Pane groupCreateNewAccount;
-    @FXML
-    private Button createNewAccountButton;
-    @FXML
-    private CheckBox checkboxCreateNewAccount;
+    @FXML private Label loggedinText;
+    @FXML private ListView myAccountList;
+    @FXML private ComboBox comboMenu;
+    @FXML private ComboBox fromAccount;
+    @FXML private ComboBox toAccount;
+    @FXML private Label headerText;
+    @FXML private Button doTransferButton;
+    @FXML private TextField transferMessage;
+    @FXML private TextField transferAmount;
+    @FXML private DatePicker datepickerTransfer;
+    @FXML private Pane groupTransferOwnAccount;
+    @FXML private Pane groupTransferOtherAccount;
+    @FXML private ComboBox fromAccountOther;
+    @FXML private MenuItem menuLoggaut;
+    @FXML private Pane groupCreateNewAccount;
+    @FXML private Button createNewAccountButton;
+    @FXML private CheckBox checkboxCreateNewAccount;
 
+    /**
+     * @author Michael
+     * @param passingInfo personalID from login controller
+     * @param name loged in persons firstname and lastname
+     */
     public void loginIn(String passingInfo, String name) {
         groupTransferOwnAccount.setVisible(false);
         groupTransferOtherAccount.setVisible(false);
@@ -97,6 +82,12 @@ public class MainController {
         );
     }
 
+    /**
+     * button for creating new account. checks if checkbox is checked.
+     * @author Michael
+     * @param e
+     * @throws FileNotFoundException
+     */
     public void createNewAccountButtonClicked (Event e) throws FileNotFoundException {
         if (checkboxCreateNewAccount.isSelected()) {
             if (createNewAccount()) {
@@ -108,6 +99,13 @@ public class MainController {
           alert.showAndWait();
         }
     }
+
+    /**
+     * create new account
+     * @author Michael
+     * @return
+     * @throws FileNotFoundException
+     */
     public boolean createNewAccount() throws FileNotFoundException {
         Random randomizer = new Random();
         String randomAccount = "";
@@ -135,6 +133,12 @@ public class MainController {
         return true;
     }
 
+    /**
+     * @author Michael
+     * @param accountnumber newly created account number
+     * @param personalid personalId of account holder
+     * @param cash amount in new account
+     */
     public void saveNewAccountToFile(String accountnumber, String personalid, double cash) {
         try {
             Files.write(Paths.get("../files/accounts.acc"), (accountnumber+";"+personalid+";"+cash+"\n").getBytes(), StandardOpenOption.APPEND);
@@ -143,6 +147,11 @@ public class MainController {
             System.out.println("Problem vid skrivning till kontofil");
         }
     }
+
+    /**
+     * fetch all accounts from csv file
+     * @author Michael
+     */
     public static void fetchAccounts() {
         try {
             Scanner accountsFileReader = new Scanner(accountsFile);
@@ -161,6 +170,11 @@ public class MainController {
             return;
         }
     }
+
+    /**
+     * log out from system, change scene to login
+     * @author Michael
+     */
     public void setMenuLoggaut() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Du loggas nu ut ur systemet!", ButtonType.OK);
         alert.setTitle("** M M B O S **");
@@ -168,6 +182,12 @@ public class MainController {
         alert.showAndWait();
         main.appWin.setScene(main.mapScenes.get("loginScene"));
     }
+
+    /**
+     * action event for combo menu
+     * @author Michael
+     * @param actionEvent
+     */
     public void comboMenu(ActionEvent actionEvent) {
        if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
            groupTransferOwnAccount.setVisible(true);

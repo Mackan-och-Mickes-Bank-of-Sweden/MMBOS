@@ -16,6 +16,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * @author Michael
+ */
 public class LoginController {
     public static LoginController lc;
     public LoginController(){
@@ -31,7 +34,14 @@ public class LoginController {
     public TextField passwordField;
     public Button loginButton;
 
-
+    /**
+     * Event when login button is clicked
+     * Loads main scene if login details are correct.
+     * @author Michael
+     * @param e
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     */
     public void loginButtonClicked(Event e) throws NoSuchAlgorithmException, IOException {
 
         fetchCustomers();
@@ -61,6 +71,13 @@ public class LoginController {
         mediaPlayer.setAutoPlay(true);
     }
 
+    /**
+     *
+     * @author Michael
+     * @param text input string
+     * @return md5 password
+     * @throws NoSuchAlgorithmException
+     */
     private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         md5.update(text.getBytes());
@@ -72,6 +89,10 @@ public class LoginController {
         return sb;
     }
 
+    /**
+     * Gets all the customers from csv file
+     * @author Michael
+     */
     public static void fetchCustomers() {
         try {
             Scanner customerFileReader = new Scanner(customersFile);
