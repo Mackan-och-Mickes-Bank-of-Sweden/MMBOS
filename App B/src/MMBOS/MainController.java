@@ -9,7 +9,13 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class MainController {
@@ -22,6 +28,9 @@ public class MainController {
     public static File accountsFile = new File("../files/accounts.acc");
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
     public static String loggedinID;
+    public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
+    public static int nextAccountNumb;
+    public static String newAccountNumber;
 
     @FXML
     private Label loggedinText;
@@ -58,8 +67,7 @@ public class MainController {
     @FXML
     private CheckBox checkboxCreateNewAccount;
 
-    @FXML
-    public void setLoggedin(String passingInfo, String name) {
+    public void loginIn(String passingInfo, String name) {
         groupTransferOwnAccount.setVisible(false);
         groupTransferOtherAccount.setVisible(false);
         groupCreateNewAccount.setVisible(false);
@@ -89,13 +97,48 @@ public class MainController {
         );
     }
 
-    public void createNewAccountButtonClicked (Event e) {
-    if (checkboxCreateNewAccount.isSelected()) {
-
-    } else {
-        Alert alert = new Alert(Alert.AlertType.WARNING, "Du måste ha läst villkoren för kontot och kryssa i rutan!", ButtonType.OK);
-        alert.showAndWait();
+    public void createNewAccountButtonClicked (Event e) throws FileNotFoundException {
+        if (checkboxCreateNewAccount.isSelected()) {
+            if (createNewAccount()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Ditt nya konto skapades!", ButtonType.OK);
+                alert.showAndWait();
+            }
+        } else {
+          Alert alert = new Alert(Alert.AlertType.WARNING, "Du måste ha läst villkoren för kontot och kryssa i rutan!", ButtonType.OK);
+          alert.showAndWait();
+        }
     }
+    public boolean createNewAccount() throws FileNotFoundException {
+        Random randomizer = new Random();
+        String randomAccount = "";
+        for (int i = 0; i < 5; i++){
+            randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
+        }
+        Scanner fileReader = new Scanner(nextAccountNumber); // Unikt kontonummer.
+        if (fileReader.hasNextLine()) {
+            nextAccountNumb = Integer.parseInt(fileReader.nextLine());
+        } else {
+            nextAccountNumb = 140337; // Första unika kontonummerserien.
+        }
+        newAccountNumber = nextAccountNumb + randomAccount;
+        Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), loggedinID, 0);
+        accountsList.add(addAccount);
+        String item = newAccountNumber.substring(0,4) + " "
+                + newAccountNumber.substring(4,6) + " "
+                + newAccountNumber.substring(6) + " \tSaldo: "
+                + "0kr";
+        myAccountList.getItems().add(item);
+        saveNewAccountToFile(newAccountNumber, loggedinID,0);
+        return true;
+    }
+
+    public void saveNewAccountToFile(String accountnumber, String personalid, double cash) {
+        try {
+            Files.write(Paths.get("../files/accounts.acc"), (accountnumber+";"+personalid+";"+cash+"\n").getBytes(), StandardOpenOption.APPEND);
+        }
+        catch (Exception e) {
+            System.out.println("Problem vid skrivning till kontofil");
+        }
     }
     public static void fetchAccounts() {
         try {

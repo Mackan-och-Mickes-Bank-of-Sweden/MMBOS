@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
@@ -21,7 +22,6 @@ public class Main extends Application {
     public void start(Stage appWin) throws Exception{
         this.appWin = appWin;
         appWin.setTitle("** M M B O S **");
-
         FXMLLoader firstFXLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
         Parent rootFirst = firstFXLoader.load();
         LoginController loginController = firstFXLoader.getController();

@@ -227,7 +227,7 @@ public class Main {
             return true;
         }
         catch (Exception e) {
-            System.out.println("Problem vid skapandet av konto");
+            System.out.println("Problem vid skrivning till kontofil");
         }
         return false;
     }

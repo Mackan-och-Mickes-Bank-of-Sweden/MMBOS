@@ -45,7 +45,7 @@ public class LoginController {
                 //playSound("src/MMBOS/startup.mp3");
                 alert.showAndWait();
                 main.appWin.setScene(main.mapScenes.get("mainScene"));
-                MainController.mc.setLoggedin(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
+                MainController.mc.loginIn(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
                 personalIDField.setText("");
                 passwordField.setText("");
                 break;
