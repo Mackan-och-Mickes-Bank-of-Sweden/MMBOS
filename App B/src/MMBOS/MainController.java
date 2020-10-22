@@ -3,6 +3,7 @@ package MMBOS;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -41,10 +42,19 @@ public class MainController {
     private TextField transferAmount;
     @FXML
     private DatePicker datepickerTransfer;
+    @FXML
+    private Pane groupTransferOwnAccount;
+    @FXML
+    private Pane groupTransferOtherAccount;
+    @FXML
+    private ComboBox fromAccountOther;
+    @FXML
+    private MenuItem menuLoggaut;
 
     @FXML
     public void setLoggedin(String passingInfo, String name) {
-        showTransfer(false);
+        groupTransferOwnAccount.setVisible(false);
+        groupTransferOtherAccount.setVisible(false);
 
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
@@ -59,6 +69,7 @@ public class MainController {
             myAccountList.getItems().add(item);
             fromAccount.getItems().add(accountsList.get(i).accountNumber);
             toAccount.getItems().add(accountsList.get(i).accountNumber);
+            fromAccountOther.getItems().add(accountsList.get(i).accountNumber);
         }
         headerText.setText(name+"s konton i banken");
         comboMenu.getItems().addAll(
@@ -88,21 +99,24 @@ public class MainController {
             return;
         }
     }
-
+    public void setMenuLoggaut() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Du loggas nu ut ur systemet!", ButtonType.OK);
+        alert.setTitle("** M M B O S **");
+        alert.setHeaderText("Välkommen åter!");
+        alert.showAndWait();
+        main.appWin.setScene(main.mapScenes.get("loginScene"));
+    }
     public void comboMenu(ActionEvent actionEvent) {
        if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
-           showTransfer(true);
+           groupTransferOwnAccount.setVisible(true);
        } else {
-           showTransfer(false);
+           groupTransferOwnAccount.setVisible(false);
+       }
+       if (comboMenu.getValue().equals("Gör en betalning till annans konto")) {
+           groupTransferOtherAccount.setVisible(true);
+       } else {
+           groupTransferOtherAccount.setVisible(false);
        }
     }
 
-    private void showTransfer(boolean b) {
-        fromAccount.setVisible(b);
-        toAccount.setVisible(b);
-        doTransferButton.setVisible(b);
-        transferMessage.setVisible(b);
-        datepickerTransfer.setVisible(b);
-        transferAmount.setVisible(b);
-    }
 }

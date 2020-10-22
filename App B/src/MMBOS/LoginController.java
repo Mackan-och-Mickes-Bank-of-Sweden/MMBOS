@@ -46,6 +46,8 @@ public class LoginController {
                 alert.showAndWait();
                 main.appWin.setScene(main.mapScenes.get("mainScene"));
                 MainController.mc.setLoggedin(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
+                personalIDField.setText("");
+                passwordField.setText("");
                 break;
             }
         }

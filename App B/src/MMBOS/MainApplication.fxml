@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
@@ -32,7 +33,7 @@
                               <MenuItem mnemonicParsing="false" text="Insättning" />
                               <MenuItem mnemonicParsing="false" text="Uttag" />
                               <SeparatorMenuItem mnemonicParsing="false" />
-                              <MenuItem mnemonicParsing="false" text="Logga ut" />
+                              <MenuItem fx:id="menuLoggaut" mnemonicParsing="false" onAction="#setMenuLoggaut" text="Logga ut" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Hjälp">
@@ -42,19 +43,33 @@
                         </Menu>
                      </menus>
                   </MenuBar>
-                  <ListView fx:id="myAccountList" prefHeight="60.0" prefWidth="239.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="2" />
+                  <ListView fx:id="myAccountList" prefHeight="133.0" prefWidth="289.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="3" />
                   <ImageView fitHeight="59.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <image>
                         <Image url="@m_m_b_o_s.png" />
                      </image>
                   </ImageView>
                   <ComboBox fx:id="comboMenu" onAction="#comboMenu" prefHeight="27.0" prefWidth="300.0" promptText="Välj åtgärd" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                  <ComboBox fx:id="fromAccount" prefHeight="27.0" prefWidth="301.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                  <ComboBox fx:id="toAccount" layoutX="448.0" layoutY="197.0" prefHeight="27.0" prefWidth="300.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
-                  <Button fx:id="doTransferButton" mnemonicParsing="false" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                  <TextField fx:id="transferMessage" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                  <DatePicker fx:id="datepickerTransfer" prefHeight="27.0" prefWidth="255.0" promptText="Datum för överföring" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                  <TextField fx:id="transferAmount" prefHeight="27.0" prefWidth="112.0" promptText="Belopp" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                  <Pane fx:id="groupTransferOwnAccount" prefHeight="183.0" prefWidth="273.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                     <children>
+                        <TextField fx:id="transferMessage" layoutY="75.0" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                        <DatePicker fx:id="datepickerTransfer" layoutY="130.0" prefHeight="27.0" prefWidth="201.0" promptText="Datum för överföring" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                        <ComboBox fx:id="fromAccount" prefHeight="27.0" prefWidth="289.0" promptText="Från konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                        <TextField fx:id="transferAmount" layoutX="178.0" layoutY="75.0" prefHeight="27.0" prefWidth="112.0" promptText="Belopp" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                        <Button fx:id="doTransferButton" layoutX="244.0" layoutY="130.0" mnemonicParsing="false" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                        <ComboBox fx:id="toAccount" layoutY="35.0" prefHeight="27.0" prefWidth="289.0" promptText="Till konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                     <children>
+                        <Button fx:id="doTransferOtherButton" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" text="Utför" />
+                        <TextField fx:id="transferAmountOther" layoutX="178.0" layoutY="81.0" prefHeight="27.0" prefWidth="104.0" promptText="Belopp" />
+                        <ComboBox fx:id="fromAccountOther" layoutY="1.0" prefHeight="27.0" prefWidth="283.0" promptText="Från konto" />
+                        <DatePicker fx:id="datepickerTransferOther" layoutY="119.0" prefHeight="27.0" prefWidth="217.0" promptText="Datum för överföring" />
+                        <TextField fx:id="transferMessageOther" layoutY="81.0" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande / OCR" />
+                        <TextField fx:id="toAccountOther" layoutY="38.0" prefHeight="27.0" prefWidth="283.0" promptText="Till konto / PG / BG" />
+                     </children>
+                  </Pane>
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

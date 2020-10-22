@@ -20,7 +20,6 @@ package MMBOS;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -34,8 +33,8 @@ public class Main {
     public static File accountsFile = new File("../files/accounts.acc");
     public static File pendingPaymentsFile = new File("../files/pendingpayments.pay");
     public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
-    public static File transferHistoryFile = new File("../logs/transfers.log");
-    public static File hashHistoryFile = new File("../logs/hashtory.log");
+    public static File transferLogFile = new File("../logs/transfers.log");
+    public static File hashtoryFile = new File("../logs/hashtory.log");
     public static int nextAccountNumb;
     public static String newAccountNumber;
     public static ArrayList <Customers> customersList = new ArrayList<>();
@@ -116,7 +115,11 @@ public class Main {
 
 // TODO: Banktillgångar
             if (headMenuChoice.equals("8")) {
-
+                double totalBankAmount = 0;
+                for (int i=0; i<accountsList.size(); i++) {
+                    totalBankAmount = totalBankAmount + accountsList.get(i).cashInAccount;
+                }
+                System.out.println("Bankens totala tillgångar: " + totalBankAmount + "kr");
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -128,7 +131,7 @@ public class Main {
                 String keyPress = keyBoard.nextLine();
             }
 
-            if (headMenuChoice.equals("10")) {
+            if (headMenuChoice.equals("h") || headMenuChoice.equals("H")) {
                 checkTransferHash();
                 //saveTransferData();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
@@ -138,8 +141,8 @@ public class Main {
     }
 
     private static void checkTransferHash() throws FileNotFoundException {
-        Scanner checkTransfersFile = new Scanner(transferHistoryFile);
-        Scanner checkHashtoryFile = new Scanner(hashHistoryFile);
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
+        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
 
         while (checkTransfersFile.hasNextLine()) {
             String rowsFromFile = checkTransfersFile.nextLine();
@@ -152,7 +155,7 @@ public class Main {
     }
 
     private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
-        Scanner checkTransfersFile = new Scanner(transferHistoryFile);
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
         String previousHash;
         int i = 0;
         while (checkTransfersFile.hasNextLine()) {
@@ -239,6 +242,7 @@ public class Main {
         System.out.format(menuFormater,"[8]", "Banktillgångar");
         System.out.format(menuFormater,"[9]", "Överföringar");
         System.out.format("%34s\n","----------------------------------");
+        System.out.format(menuFormater,"[H]", "Hash kontroll");
         System.out.format(menuFormater,"[0]", "Avsluta programmet");
         System.out.print("\nMenyval: ");
         String headMenuChoise = keyBoard.nextLine();
