@@ -66,7 +66,7 @@
                         <DatePicker fx:id="datepickerTransfer" layoutY="130.0" prefHeight="27.0" prefWidth="201.0" promptText="Datum för överföring" GridPane.columnIndex="3" GridPane.rowIndex="5" />
                         <ComboBox fx:id="fromAccount" prefHeight="27.0" prefWidth="289.0" promptText="Från konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
                         <TextField fx:id="transferAmount" layoutX="178.0" layoutY="75.0" prefHeight="27.0" prefWidth="112.0" promptText="Belopp" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                        <Button fx:id="doTransferButton" layoutX="244.0" layoutY="130.0" mnemonicParsing="false" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                        <Button fx:id="doTransferButton" onAction="#doTransferButtonClicked" layoutX="244.0" layoutY="130.0" mnemonicParsing="false" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
                         <ComboBox fx:id="toAccount" layoutY="35.0" prefHeight="27.0" prefWidth="289.0" promptText="Till konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
                      </children>
                   </Pane>

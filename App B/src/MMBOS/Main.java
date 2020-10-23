@@ -19,7 +19,7 @@ public class Main extends Application {
     HashMap <String, Scene> mapScenes = new HashMap<>();
     Stage appWin = null;
     @Override
-    
+
     public void start(Stage appWin) throws Exception{
         this.appWin = appWin;
         appWin.setTitle("** M M B O S **");
@@ -44,6 +44,7 @@ public class Main extends Application {
     }
 
     /**
+     * event handler for the keyboard's enter-button when logging in
      * @author Michael
      * @param root
      */

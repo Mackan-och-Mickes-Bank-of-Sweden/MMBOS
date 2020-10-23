@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -47,7 +48,41 @@ public class MainController {
     @FXML private Button createNewAccountButton;
     @FXML private CheckBox checkboxCreateNewAccount;
 
+    //TODO:doTransferBetweenAccounts - skapa error vid otillräckliga medel, datumkontroll, spara nya saldon till filen
+
+    public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double transferAmount) {
+        for (int i=0; i<accountsList.size(); i++) {
+            if (accountsList.get(i).accountNumber==fromAccountNumber) {
+                Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(),(accountsList.get(i).cashInAccount-transferAmount));
+                accountsList.set(i, updateAccount);
+            }
+            if (accountsList.get(i).accountNumber==toAccountNumber) {
+                Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(),(accountsList.get(i).cashInAccount+transferAmount));
+                accountsList.set(i, updateAccount);
+            }
+        }
+        myAccountList.getItems().clear();
+        for (int i=0; i<accountsList.size(); i++) {
+            String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
+                    + accountsList.get(i).cashInAccount + "kr";
+            myAccountList.getItems().add(item);
+        }
+    }
+
+    public void doTransferButtonClicked (Event e) {
+        if (fromAccount.hasProperties() && toAccount.hasProperties()) {
+            doTransferBetweenAccounts(Long.parseLong(fromAccount.getValue().toString()), Long.parseLong(toAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Överföringen mellan dina konton utfördes!", ButtonType.OK);
+            alert.setTitle("** M M B O S **");
+            alert.setHeaderText("Kontoöverföring");
+            alert.showAndWait();
+        }
+    }
+
     /**
+     * initialize
      * @author Michael
      * @param passingInfo personalID from login controller
      * @param name loged in persons firstname and lastname
@@ -101,7 +136,7 @@ public class MainController {
     }
 
     /**
-     * create new account
+     * event when the "create new account" button is clicked
      * @author Michael
      * @return
      * @throws FileNotFoundException
@@ -134,6 +169,7 @@ public class MainController {
     }
 
     /**
+     * creates the new account and saves it to the csv file
      * @author Michael
      * @param accountnumber newly created account number
      * @param personalid personalId of account holder
@@ -149,7 +185,7 @@ public class MainController {
     }
 
     /**
-     * fetch all accounts from csv file
+     * fetch all the users accounts from csv file
      * @author Michael
      */
     public static void fetchAccounts() {
