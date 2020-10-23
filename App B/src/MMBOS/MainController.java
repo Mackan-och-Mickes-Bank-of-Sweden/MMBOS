@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
@@ -48,20 +49,39 @@ public class MainController {
     @FXML private Button createNewAccountButton;
     @FXML private CheckBox checkboxCreateNewAccount;
 
-    //TODO:doTransferBetweenAccounts - skapa error vid otillräckliga medel, datumkontroll, spara nya saldon till filen
+    //TODO:doTransferBetweenAccounts - spara nya saldon till filen
 
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double transferAmount) {
-        for (int i=0; i<accountsList.size(); i++) {
-            if (accountsList.get(i).accountNumber==fromAccountNumber) {
-                Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(),(accountsList.get(i).cashInAccount-transferAmount));
-                accountsList.set(i, updateAccount);
-            }
-            if (accountsList.get(i).accountNumber==toAccountNumber) {
-                Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(),(accountsList.get(i).cashInAccount+transferAmount));
-                accountsList.set(i, updateAccount);
-            }
+        LocalDate dateForTransfer;
+        if(datepickerTransfer.getValue() != null){
+            dateForTransfer = datepickerTransfer.getValue();
+        } else {
+            dateForTransfer = LocalDate.now();
         }
-        updateAccountListComboBoxes();
+        if (dateForTransfer.isBefore(LocalDate.now())) {
+            alertPopup("Datum kan inte vara tidigare än dagens datum","Kontoöverföring");
+        }
+        if (dateForTransfer.equals(LocalDate.now())) {
+            for (int i = 0; i < accountsList.size(); i++) {
+                if (accountsList.get(i).accountNumber == fromAccountNumber) {
+                    if (accountsList.get(i).cashInAccount < transferAmount) {
+                        alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Kontoöverföring");
+                        break;
+                    }
+                    Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - transferAmount));
+                    accountsList.set(i, updateAccount);
+                }
+                if (accountsList.get(i).accountNumber == toAccountNumber) {
+                    Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount + transferAmount));
+                    accountsList.set(i, updateAccount);
+                }
+            }
+            updateAccountListComboBoxes();
+            alertPopup("Överföringen mellan dina konton utfördes!", "Kontoöverföring");
+        } else {
+
+            //TODO: spara överföringen till csv fil för senare överföring via timer App C
+        }
     }
 
     public void updateAccountListComboBoxes() {
@@ -78,11 +98,14 @@ public class MainController {
     public void doTransferButtonClicked (Event e) {
         if (fromAccount.hasProperties() && toAccount.hasProperties()) {
             doTransferBetweenAccounts(Long.parseLong(fromAccount.getValue().toString()), Long.parseLong(toAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Överföringen mellan dina konton utfördes!", ButtonType.OK);
-            alert.setTitle("** M M B O S **");
-            alert.setHeaderText("Kontoöverföring");
-            alert.showAndWait();
         }
+    }
+
+    private void alertPopup(String messageText, String headerText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, messageText, ButtonType.OK);
+        alert.setTitle("** M M B O S **");
+        alert.setHeaderText(headerText);
+        alert.showAndWait();
     }
 
     /**
@@ -216,10 +239,7 @@ public class MainController {
      * @author Michael
      */
     public void setMenuLoggaut() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Du loggas nu ut ur systemet!", ButtonType.OK);
-        alert.setTitle("** M M B O S **");
-        alert.setHeaderText("Välkommen åter!");
-        alert.showAndWait();
+        alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
         main.appWin.setScene(main.mapScenes.get("loginScene"));
     }
 

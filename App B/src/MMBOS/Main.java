@@ -30,6 +30,7 @@ public class Main extends Application {
         Scene loginScene = new Scene(rootFirst, 800, 400);
         mapScenes.put("loginScene", loginScene);
         appWin.setScene(loginScene);
+        appWin.setResizable(false);
         appWin.show();
 
         FXMLLoader secondFXLoader = new FXMLLoader(getClass().getResource("MainApplication.fxml"));
