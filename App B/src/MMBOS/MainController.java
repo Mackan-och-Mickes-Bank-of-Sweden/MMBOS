@@ -61,6 +61,10 @@ public class MainController {
                 accountsList.set(i, updateAccount);
             }
         }
+        updateAccountListComboBoxes();
+    }
+
+    public void updateAccountListComboBoxes() {
         myAccountList.getItems().clear();
         for (int i=0; i<accountsList.size(); i++) {
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
