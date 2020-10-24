@@ -2,8 +2,10 @@ package MMBOS;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
@@ -13,7 +15,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -25,7 +26,8 @@ public class MainController {
     Main main;
 
     public static File accountsFile = new File("../files/accounts.acc");
-    public static ArrayList <Accounts> accountsList = new ArrayList<>();
+    public static ArrayList <Accounts> customersAccountsList = new ArrayList<>();
+    public static ArrayList <Accounts> allAccountsList = new ArrayList<>();
     public static String loggedinID;
     public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
     public static int nextAccountNumb;
@@ -34,8 +36,8 @@ public class MainController {
     @FXML private Label loggedinText;
     @FXML private ListView myAccountList;
     @FXML private ComboBox comboMenu;
-    @FXML private ComboBox fromAccount;
-    @FXML private ComboBox toAccount;
+    @FXML private ComboBox cbTransferFromAccount;
+    @FXML private ComboBox cbTransferToAccount;
     @FXML private Label headerText;
     @FXML private Button doTransferButton;
     @FXML private TextField transferMessage;
@@ -43,15 +45,21 @@ public class MainController {
     @FXML private DatePicker datepickerTransfer;
     @FXML private Pane groupTransferOwnAccount;
     @FXML private Pane groupTransferOtherAccount;
-    @FXML private ComboBox fromAccountOther;
+    @FXML private ComboBox cbTransferFromAccountOther;
     @FXML private MenuItem menuLoggaut;
     @FXML private Pane groupCreateNewAccount;
     @FXML private Button createNewAccountButton;
     @FXML private CheckBox checkboxCreateNewAccount;
+    @FXML private Pane groupDeposit;
+    @FXML private Button depositButton;
+    @FXML private TextField depositAmount;
+    @FXML private ComboBox cbDepositFromAccount;
+    @FXML private AnchorPane depositPopup;
+    @FXML private Button cashButton;
 
     //TODO:doTransferBetweenAccounts - spara nya saldon till filen
 
-    public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double transferAmount) {
+    public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) {
         LocalDate dateForTransfer;
         if(datepickerTransfer.getValue() != null){
             dateForTransfer = datepickerTransfer.getValue();
@@ -61,19 +69,19 @@ public class MainController {
         if (dateForTransfer.isBefore(LocalDate.now())) {
             alertPopup("Datum kan inte vara tidigare än dagens datum","Kontoöverföring");
         }
-        if (dateForTransfer.equals(LocalDate.now())) {
-            for (int i = 0; i < accountsList.size(); i++) {
-                if (accountsList.get(i).accountNumber == fromAccountNumber) {
-                    if (accountsList.get(i).cashInAccount < transferAmount) {
+        else if (dateForTransfer.equals(LocalDate.now())) {
+            for (int i = 0; i < customersAccountsList.size(); i++) {
+                if (customersAccountsList.get(i).accountNumber == fromAccountNumber) {
+                    if (customersAccountsList.get(i).cashInAccount < amountToTransfer) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Kontoöverföring");
                         break;
                     }
-                    Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - transferAmount));
-                    accountsList.set(i, updateAccount);
+                    Accounts updateAccount = new Accounts(fromAccountNumber, customersAccountsList.get(i).getPersonalID(), (customersAccountsList.get(i).cashInAccount - amountToTransfer));
+                    customersAccountsList.set(i, updateAccount);
                 }
-                if (accountsList.get(i).accountNumber == toAccountNumber) {
-                    Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount + transferAmount));
-                    accountsList.set(i, updateAccount);
+                if (customersAccountsList.get(i).accountNumber == toAccountNumber) {
+                    Accounts updateAccount = new Accounts(toAccountNumber, customersAccountsList.get(i).getPersonalID(), (customersAccountsList.get(i).cashInAccount + amountToTransfer));
+                    customersAccountsList.set(i, updateAccount);
                 }
             }
             updateAccountListComboBoxes();
@@ -86,18 +94,20 @@ public class MainController {
 
     public void updateAccountListComboBoxes() {
         myAccountList.getItems().clear();
-        for (int i=0; i<accountsList.size(); i++) {
-            String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
-                    + accountsList.get(i).cashInAccount + "kr";
+        for (int i = 0; i< customersAccountsList.size(); i++) {
+            String item = String.valueOf(customersAccountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(customersAccountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(customersAccountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
+                    + customersAccountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
         }
     }
 
     public void doTransferButtonClicked (Event e) {
-        if (fromAccount.hasProperties() && toAccount.hasProperties()) {
-            doTransferBetweenAccounts(Long.parseLong(fromAccount.getValue().toString()), Long.parseLong(toAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
+        if (!cbTransferFromAccount.getSelectionModel().isEmpty() && !cbTransferToAccount.getSelectionModel().isEmpty() && !transferAmount.getText().isEmpty()) {
+            doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccount.getValue().toString()), Long.parseLong(cbTransferToAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
+        } else {
+            alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra överföringen","Kontoöverföring");
         }
     }
 
@@ -118,21 +128,23 @@ public class MainController {
         groupTransferOwnAccount.setVisible(false);
         groupTransferOtherAccount.setVisible(false);
         groupCreateNewAccount.setVisible(false);
+        groupDeposit.setVisible(false);
 
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
         fetchAccounts();
         myAccountList.setMaxSize(300,600);
-        for (int i=0; i<accountsList.size(); i++) {
-            String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
-                    + accountsList.get(i).cashInAccount + "kr";
+        for (int i = 0; i< customersAccountsList.size(); i++) {
+            String item = String.valueOf(customersAccountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(customersAccountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(customersAccountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
+                    + customersAccountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
-            fromAccount.getItems().add(accountsList.get(i).accountNumber);
-            toAccount.getItems().add(accountsList.get(i).accountNumber);
-            fromAccountOther.getItems().add(accountsList.get(i).accountNumber);
+            cbTransferFromAccount.getItems().add(customersAccountsList.get(i).accountNumber);
+            cbTransferToAccount.getItems().add(customersAccountsList.get(i).accountNumber);
+            cbTransferFromAccountOther.getItems().add(customersAccountsList.get(i).accountNumber);
+            cbDepositFromAccount.getItems().add(customersAccountsList.get(i).accountNumber);
         }
         headerText.setText(name+"s konton i banken");
         comboMenu.getItems().addAll(
@@ -142,6 +154,18 @@ public class MainController {
                 "Gör en överföring mellan egna konton",
                 "Gör en betalning till annans konto"
         );
+    }
+
+    public void depositButtonClicked (Event e) {
+        if (depositAmount.getText() != null && !cbDepositFromAccount.getSelectionModel().isEmpty()) {
+            depositPopup.setVisible(true);
+        } else {
+            alertPopup("Antingen har belopp eller uttagskonto inte angivits","Uttag från konto");
+        }
+    }
+
+    public void cashButtonClicked (Event e) {
+        depositPopup.setVisible(false);
     }
 
     /**
@@ -182,15 +206,17 @@ public class MainController {
         }
         newAccountNumber = nextAccountNumb + randomAccount;
         Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), loggedinID, 0);
-        accountsList.add(addAccount);
+        customersAccountsList.add(addAccount);
+        allAccountsList.add(addAccount);
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
                 + newAccountNumber.substring(6) + " \tSaldo: "
                 + "0.0kr";
         myAccountList.getItems().add(item);
-        fromAccount.getItems().add(newAccountNumber);
-        toAccount.getItems().add(newAccountNumber);
-        fromAccountOther.getItems().add(newAccountNumber);
+        cbTransferFromAccount.getItems().add(newAccountNumber);
+        cbTransferToAccount.getItems().add(newAccountNumber);
+        cbTransferFromAccountOther.getItems().add(newAccountNumber);
+        cbDepositFromAccount.getItems().add(newAccountNumber);
         saveNewAccountToFile(newAccountNumber, loggedinID,0);
         return true;
     }
@@ -212,21 +238,23 @@ public class MainController {
     }
 
     /**
-     * fetch all the users accounts from csv file
+     * fetch all the loged in user's accounts from csv file -> customersAccountsList
+     * fetch all existing accounts from csv file -> allAccountsList
      * @author Michael
      */
     public static void fetchAccounts() {
         try {
             Scanner accountsFileReader = new Scanner(accountsFile);
-            accountsList.clear();
+            customersAccountsList.clear();
+            allAccountsList.clear();
             while (accountsFileReader.hasNextLine()) {
                 String rowsFromFile = accountsFileReader.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
+                Accounts readAccountforAll = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
+                allAccountsList.add(readAccountforAll);
                 if (!readerParts[1].equals(loggedinID)) continue;
                 Accounts readAccount = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
-                accountsList.add(readAccount);
-
-
+                customersAccountsList.add(readAccount);
             }
         } catch (Exception e) {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
@@ -264,6 +292,11 @@ public class MainController {
        } else {
            groupCreateNewAccount.setVisible(false);
        }
+        if (comboMenu.getValue().equals("Uttag från konto")) {
+            groupDeposit.setVisible(true);
+        } else {
+            groupDeposit.setVisible(false);
+        }
     }
 
 }
