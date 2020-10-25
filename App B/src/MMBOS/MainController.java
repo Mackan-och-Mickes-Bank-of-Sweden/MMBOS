@@ -39,23 +39,27 @@ public class MainController {
     @FXML private ComboBox cbTransferFromAccount;
     @FXML private ComboBox cbTransferToAccount;
     @FXML private Label headerText;
-    @FXML private Button doTransferButton;
+    //@FXML private Button doTransferButton;
     @FXML private TextField transferMessage;
     @FXML private TextField transferAmount;
     @FXML private DatePicker datepickerTransfer;
     @FXML private Pane groupTransferOwnAccount;
     @FXML private Pane groupTransferOtherAccount;
+    @FXML private DatePicker datepickerTransferOther;
     @FXML private ComboBox cbTransferFromAccountOther;
-    @FXML private MenuItem menuLoggaut;
+    @FXML private TextField transferMessageOther;
+    @FXML private TextField toAccountOther;
+    @FXML private TextField transferAmountOther;
+    //@FXML private MenuItem menuLoggaut;
     @FXML private Pane groupCreateNewAccount;
-    @FXML private Button createNewAccountButton;
+    //@FXML private Button createNewAccountButton;
     @FXML private CheckBox checkboxCreateNewAccount;
     @FXML private Pane groupDeposit;
-    @FXML private Button depositButton;
+    //@FXML private Button depositButton;
     @FXML private TextField depositAmount;
     @FXML private ComboBox cbDepositFromAccount;
     @FXML private AnchorPane depositPopup;
-    @FXML private Button cashButton;
+    //@FXML private Button cashButton;
 
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
         LocalDate dateForTransfer;
@@ -102,6 +106,51 @@ public class MainController {
         }
     }
 
+    public void doTransferOtherAccount(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
+        LocalDate dateForTransfer;
+        if(datepickerTransferOther.getValue() != null){
+            dateForTransfer = datepickerTransferOther.getValue();
+        } else {
+            dateForTransfer = LocalDate.now();
+        }
+        if (dateForTransfer.isBefore(LocalDate.now())) {
+            alertPopup("Datum kan inte vara tidigare än dagens datum","Betalning / Överföring till annans konto");
+        }
+        else if (dateForTransfer.equals(LocalDate.now())) {
+            for (int i = 0; i < accountsList.size(); i++) {
+                if (accountsList.get(i).accountNumber == fromAccountNumber) {
+                    if (accountsList.get(i).cashInAccount < amountToTransfer) {
+                        alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Betalning / Överföring till annans konto");
+                        break;
+                    }
+                    Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - amountToTransfer));
+                    accountsList.set(i, updateAccount);
+                }
+                if (accountsList.get(i).accountNumber == toAccountNumber) {
+                    Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount + amountToTransfer));
+                    accountsList.set(i, updateAccount);
+                }
+            }
+            updateAccountListComboBoxes();
+            saveAccountsToFile();
+            alertPopup("Överföringen/Betalningen har utförts!", "Betalning / Överföring till annans konto");
+        } else {
+            String message;
+            if (transferMessageOther.getText().isEmpty()) {
+                message = "";
+            } else {
+                message = transferMessageOther.getText();
+            }
+            try {
+                Files.write(Paths.get("../files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                alertPopup("Överföringen/Betalningen har lagts till och kommer att genomföras det valda datumet","Betalning / Överföring till annans konto");
+            }
+            catch (Exception e) {
+                System.out.println("Problem vid skrivning till överföringsfilen.");
+            }
+        }
+    }
+
     public void saveAccountsToFile() throws IOException {
         FileWriter fw = new FileWriter(accountsFile);
         for (int i=0; i < accountsList.size(); i++) {
@@ -133,7 +182,6 @@ public class MainController {
         comboMenu.setValue("Gör en betalning till annans konto");
         groupTransferOtherAccount.setVisible(true);
     }
-
     public void menuDoTransferClicked (Event e) {
         hideAllGroups();
         comboMenu.setValue("Gör en överföring mellan egna konton");
@@ -145,7 +193,7 @@ public class MainController {
         groupDeposit.setVisible(true);
     }
     public void menuHelpAboutClicked (Event e) {
-        alertPopup("Marcus & Michaels projektarbete i Objektorienterad Programmering 1, SYSJG4","Om MMBOS - Mackan & Micke's Bank of Sweden");
+        alertPopup("Marcus Richardsson & Michael Hejls projektarbete i Objektorienterad Programmering 1, SYSJG4 2020","Om MMBOS - Mackan & Micke's Bank of Sweden");
     }
     public void menuNewAccountClicked (Event e) {
         hideAllGroups();
@@ -161,7 +209,13 @@ public class MainController {
         alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
         main.appWin.setScene(main.mapScenes.get("loginScene"));
     }
-
+    public void doTransferOtherButtonClicked (Event e) throws IOException {
+        if (!cbTransferFromAccountOther.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
+            doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccountOther.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
+        } else {
+            alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra betalningen/överföringen","Betalning / Överföring till annans konto");
+        }
+    }
     public void doTransferButtonClicked (Event e) throws IOException {
         if (!cbTransferFromAccount.getSelectionModel().isEmpty() && !cbTransferToAccount.getSelectionModel().isEmpty() && !transferAmount.getText().isEmpty()) {
             doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccount.getValue().toString()), Long.parseLong(cbTransferToAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
