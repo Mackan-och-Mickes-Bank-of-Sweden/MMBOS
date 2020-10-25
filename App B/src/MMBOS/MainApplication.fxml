@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import java.lang.*?>
@@ -25,7 +26,7 @@
                <children>
                   <Label fx:id="headerText" text="Mina konton" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <font>
-                        <Font size="20.0" />
+                        <Font size="16.0" />
                      </font>
                   </Label>
                   <Label fx:id="loggedinText" layoutX="155.0" layoutY="81.0" text="Inloggad">
@@ -37,23 +38,22 @@
                      <menus>
                         <Menu mnemonicParsing="false" text="Meny">
                            <items>
-                              <MenuItem mnemonicParsing="false" text="Öppna nytt konto" />
-                              <MenuItem mnemonicParsing="false" text="Betala räkning" />
-                              <MenuItem mnemonicParsing="false" text="Överföring" />
-                              <MenuItem mnemonicParsing="false" text="Insättning" />
-                              <MenuItem mnemonicParsing="false" text="Uttag" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuNewAccountClicked" text="Öppna nytt konto" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuDoTranferOtherClicked" text="Betala räkning" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuDoTransferClicked" text="Överföring" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuDepositClicked" text="Uttag" />
                               <SeparatorMenuItem mnemonicParsing="false" />
-                              <MenuItem fx:id="menuLoggaut" mnemonicParsing="false" onAction="#setMenuLoggaut" text="Logga ut" />
+                              <MenuItem fx:id="menuLoggaut" mnemonicParsing="false" onAction="#menuLogoutClicked" text="Logga ut" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Hjälp">
                            <items>
-                              <MenuItem mnemonicParsing="false" text="Om  MMBOS" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuHelpAboutClicked" text="Om  MMBOS" />
                            </items>
                         </Menu>
                      </menus>
                   </MenuBar>
-                  <ListView fx:id="myAccountList" prefHeight="133.0" prefWidth="289.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="3" />
+                  <ListView fx:id="myAccountList" maxWidth="328.0" minWidth="328.0" prefHeight="216.0" prefWidth="328.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="3" />
                   <ImageView fitHeight="59.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <image>
                         <Image url="@m_m_b_o_s.png" />

@@ -57,8 +57,6 @@ public class MainController {
     @FXML private AnchorPane depositPopup;
     @FXML private Button cashButton;
 
-    //TODO:doTransferBetweenAccounts - spara nya saldon till filen
-
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
         LocalDate dateForTransfer;
         if(datepickerTransfer.getValue() != null){
@@ -88,8 +86,19 @@ public class MainController {
             saveAccountsToFile();
             alertPopup("Överföringen mellan dina konton utfördes!", "Kontoöverföring");
         } else {
-
-            //TODO: spara överföringen till csv fil för senare överföring via timer App C
+            String message;
+            if (transferMessage.getText().isEmpty()) {
+                message = "";
+            } else {
+                message = transferMessage.getText();
+            }
+            try {
+                Files.write(Paths.get("../files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                alertPopup("Överföringen har lagts till och kommer att genomföras det valda datumet","Kontoöverföring");
+            }
+            catch (Exception e) {
+                System.out.println("Problem vid skrivning till överföringsfilen.");
+            }
         }
     }
 
@@ -106,10 +115,51 @@ public class MainController {
             if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tDisponibelt belopp: "
                     + accountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
         }
+    }
+
+    private void hideAllGroups() {
+        groupTransferOwnAccount.setVisible(false);
+        groupTransferOtherAccount.setVisible(false);
+        groupCreateNewAccount.setVisible(false);
+        groupDeposit.setVisible(false);
+    }
+
+    public void menuDoTranferOtherClicked (Event e) {
+        hideAllGroups();
+        comboMenu.setValue("Gör en betalning till annans konto");
+        groupTransferOtherAccount.setVisible(true);
+    }
+
+    public void menuDoTransferClicked (Event e) {
+        hideAllGroups();
+        comboMenu.setValue("Gör en överföring mellan egna konton");
+        groupTransferOwnAccount.setVisible(true);
+    }
+    public void menuDepositClicked (Event e) {
+        hideAllGroups();
+        comboMenu.setValue("Uttag från konto");
+        groupDeposit.setVisible(true);
+    }
+    public void menuHelpAboutClicked (Event e) {
+        alertPopup("Marcus & Michaels projektarbete i Objektorienterad Programmering 1, SYSJG4","Om MMBOS - Mackan & Micke's Bank of Sweden");
+    }
+    public void menuNewAccountClicked (Event e) {
+        hideAllGroups();
+        groupCreateNewAccount.setVisible(true);
+        comboMenu.setValue("Öppna nytt konto");
+    }
+    
+    /**
+     * log out from system, change scene to login
+     * @author Michael
+     */
+    public void menuLogoutClicked() {
+        alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
+        main.appWin.setScene(main.mapScenes.get("loginScene"));
     }
 
     public void doTransferButtonClicked (Event e) throws IOException {
@@ -134,21 +184,17 @@ public class MainController {
      * @param name loged in persons firstname and lastname
      */
     public void loginIn(String passingInfo, String name) {
-        groupTransferOwnAccount.setVisible(false);
-        groupTransferOtherAccount.setVisible(false);
-        groupCreateNewAccount.setVisible(false);
-        groupDeposit.setVisible(false);
-
+        hideAllGroups();
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
         fetchAccounts();
-        myAccountList.setMaxSize(300,600);
+        myAccountList.setPrefWidth(300);
         for (int i = 0; i< accountsList.size(); i++) {
             if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tSaldo: "
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tDisponibelt belopp: "
                     + accountsList.get(i).cashInAccount + "kr";
             myAccountList.getItems().add(item);
             cbTransferFromAccount.getItems().add(accountsList.get(i).accountNumber);
@@ -218,7 +264,7 @@ public class MainController {
         accountsList.add(addAccount);
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
-                + newAccountNumber.substring(6) + " \tSaldo: "
+                + newAccountNumber.substring(6) + " \tDisponibelt belopp: "
                 + "0.0kr";
         myAccountList.getItems().add(item);
         cbTransferFromAccount.getItems().add(newAccountNumber);
@@ -268,39 +314,20 @@ public class MainController {
     }
 
     /**
-     * log out from system, change scene to login
-     * @author Michael
-     */
-    public void setMenuLoggaut() {
-        alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
-        main.appWin.setScene(main.mapScenes.get("loginScene"));
-    }
-
-    /**
      * action event for combo menu
      * @author Michael
      * @param actionEvent
      */
     public void comboMenu(ActionEvent actionEvent) {
-       if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
-           groupTransferOwnAccount.setVisible(true);
-       } else {
-           groupTransferOwnAccount.setVisible(false);
-       }
-       if (comboMenu.getValue().equals("Gör en betalning till annans konto")) {
-           groupTransferOtherAccount.setVisible(true);
-       } else {
-           groupTransferOtherAccount.setVisible(false);
-       }
-       if (comboMenu.getValue().equals("Öppna nytt konto")) {
-           groupCreateNewAccount.setVisible(true);
-       } else {
-           groupCreateNewAccount.setVisible(false);
-       }
-        if (comboMenu.getValue().equals("Uttag från konto")) {
+        hideAllGroups();
+        if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
+            groupTransferOwnAccount.setVisible(true);
+        } else if (comboMenu.getValue().equals("Gör en betalning till annans konto")) {
+            groupTransferOtherAccount.setVisible(true);
+        } else if (comboMenu.getValue().equals("Öppna nytt konto")) {
+            groupCreateNewAccount.setVisible(true);
+        } else if (comboMenu.getValue().equals("Uttag från konto")) {
             groupDeposit.setVisible(true);
-        } else {
-            groupDeposit.setVisible(false);
         }
     }
 
