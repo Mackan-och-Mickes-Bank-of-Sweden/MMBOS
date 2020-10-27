@@ -26,10 +26,10 @@ public class MainController {
     }
     Main main;
 
-    public static File accountsFile = new File("../files/accounts.acc");
+    public static File accountsFile = new File("files/accounts.acc");
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
     public static String loggedinID;
-    public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
+    public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
     public static int nextAccountNumb;
     public static String newAccountNumber;
 
@@ -137,7 +137,7 @@ public class MainController {
                 message = transferMessageOther.getText();
             }
             try {
-                Files.write(Paths.get("../files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
                 alertPopup("Överföringen/Betalningen har lagts till och kommer att genomföras det valda datumet","Betalning / Överföring till annans konto");
             }
             catch (Exception e) {
@@ -357,7 +357,7 @@ public class MainController {
      */
     public void saveNewAccountToFile(String accountnumber, String personalid, double cash) {
         try {
-            Files.write(Paths.get("../files/accounts.acc"), (accountnumber+";"+personalid+";"+cash+"\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get("files/accounts.acc"), (accountnumber+";"+personalid+";"+cash+"\n").getBytes(), StandardOpenOption.APPEND);
         }
         catch (Exception e) {
             System.out.println("Problem vid skrivning till kontofil");
