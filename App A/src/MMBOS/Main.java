@@ -57,7 +57,7 @@ public class Main {
                 createNewCustomer();
             }
 
-// Menyval 1 : Skapa nytt konto
+// Menyval 3 : Skapa nytt konto
             if (headMenuChoice.equals("3")) {
                 createNewAccount();
                 if (saveAccountsToFile()) {
@@ -70,14 +70,14 @@ public class Main {
                 String keyPress = keyBoard.nextLine();
             }
 
-// Menyval 2 : Lista alla kunder
+// Menyval 4 : Lista alla kunder
             if (headMenuChoice.equals("4")) {
                 listCustomers();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
 
-// Menyval 3 : Lista alla konton
+// Menyval 5 : Lista alla konton
             if (headMenuChoice.equals("5")) {
                 String accountFormat = "%-15s %10.2f\n";
                 System.out.println("\nListar alla konton på banken");
@@ -138,23 +138,18 @@ public class Main {
     private static void checkTransferHash() throws FileNotFoundException {
         Scanner checkTransfersFile = new Scanner(transferLogFile);
         Scanner checkHashtoryFile = new Scanner(hashtoryFile);
-        String savedHash = "";
-        String checkedHashResult;
 
         while (checkTransfersFile.hasNextLine()) {
             String rowsFromFile = checkTransfersFile.nextLine();
             String rowsFromHashtory = checkHashtoryFile.nextLine();
             String[] readerHashParts = rowsFromHashtory.split(";");
-            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2], readerHashParts[3]));
-            savedHash = readerHashParts[0];
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2],readerHashParts[3]));
         }
-        checkedHashResult = blockChecker.get(blockChecker.size() - 1).hash;
-        if (savedHash.equals(checkedHashResult)) {
-            System.out.println("Hashcheck stämmer");
-        }
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
+        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
     }
 
-    private static void standardHash() throws FileNotFoundException {
+    private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
         Scanner checkTransfersFile = new Scanner(transferLogFile);
         String previousHash;
         int i = 0;
@@ -167,7 +162,7 @@ public class Main {
             }
             String rowsFromFile = checkTransfersFile.nextLine();
             blockchain.add(new Block(rowsFromFile, previousHash));
-            System.out.println("Hash av block " + i + " . . .");
+            System.out.println("Hash av block "+i+" . . .");
             blockchain.get(i).mineBlock(numOfZerosInHash);
             i++;
         }
@@ -177,6 +172,7 @@ public class Main {
         System.out.println("\nThe block chain: ");
         System.out.println(blockchainJson);
     }
+
 
     private static void listCustomers() {
         String customerFormat = "%-5s %-20s %-25s\n";
