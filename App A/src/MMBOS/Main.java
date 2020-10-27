@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,7 +43,7 @@ public class Main {
     public static ArrayList<BlockCheck> blockChecker = new ArrayList<>();
     public static final String role = "Customer";
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, NoSuchAlgorithmException {
 
         checkForFiles();
         fetchCustomers();
@@ -463,7 +465,7 @@ public class Main {
     Code by Marcus
      */
 
-    public static void createNewCustomer() {
+    public static void createNewCustomer() throws NoSuchAlgorithmException {
 
         System.out.print("Enter first name: ");
         String firstname = keyBoard.nextLine();
@@ -486,7 +488,7 @@ public class Main {
             }
 
             if (term) {
-                Customers newCustomer = new Customers(personID, firstname, lastname, password1, role);
+                Customers newCustomer = new Customers(personID, firstname, lastname, String.valueOf(md5Pass(password1)), role);
                 customersList.add(newCustomer);
             }
 
@@ -532,7 +534,7 @@ public class Main {
         }
     }
 
-    public static void login() {
+    public static void login() throws NoSuchAlgorithmException {
         System.out.println("Login to your account");
 
         System.out.print("Enter birth ID: ");
@@ -543,7 +545,7 @@ public class Main {
         boolean term = true;
         for (int i = 0; i < customersList.size(); i++) {
             if (customersList.get(i).getPersonalID().equals(birthID)) {
-                if (customersList.get(i).passWd.equals(password)) {
+                if (customersList.get(i).passWd.equals(String.valueOf(md5Pass(password)))) {
                     System.out.println("Welcome " + customersList.get(i).firstName + " " + customersList.get(i).lastName);
                     bankID = i;
                     term = false;
@@ -730,6 +732,16 @@ public class Main {
             System.out.println("You need to enter a valid index.");
         }
 
+    }
+    private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        md5.update(text.getBytes());
+        byte[] md5Password = md5.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : md5Password) {
+            sb.append(String.format("%02x", b & 0xff));
+        }
+        return sb;
     }
 }
 
