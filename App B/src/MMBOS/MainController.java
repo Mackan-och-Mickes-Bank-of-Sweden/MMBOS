@@ -46,7 +46,7 @@ public class MainController {
     @FXML private Pane groupTransferOwnAccount;
     @FXML private Pane groupTransferOtherAccount;
     @FXML private DatePicker datepickerTransferOther;
-    @FXML private ComboBox cbTransferFromAccountOther;
+    @FXML private ComboBox cbTransferOtherFromAccount;
     @FXML private TextField transferMessageOther;
     @FXML private TextField toAccountOther;
     @FXML private TextField transferAmountOther;
@@ -208,10 +208,11 @@ public class MainController {
     public void menuLogoutClicked() {
         alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
         main.appWin.setScene(main.mapScenes.get("loginScene"));
+        LoginController.lc.personalIDField.requestFocus();
     }
     public void doTransferOtherButtonClicked (Event e) throws IOException {
-        if (!cbTransferFromAccountOther.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
-            doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccountOther.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
+        if (!cbTransferOtherFromAccount.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
+            doTransferOtherAccount(Long.parseLong(cbTransferOtherFromAccount.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
         } else {
             alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra betalningen/överföringen","Betalning / Överföring till annans konto");
         }
@@ -239,6 +240,7 @@ public class MainController {
      */
     public void loginIn(String passingInfo, String name) {
         hideAllGroups();
+        clearAllLists();
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
@@ -253,10 +255,11 @@ public class MainController {
             myAccountList.getItems().add(item);
             cbTransferFromAccount.getItems().add(accountsList.get(i).accountNumber);
             cbTransferToAccount.getItems().add(accountsList.get(i).accountNumber);
-            cbTransferFromAccountOther.getItems().add(accountsList.get(i).accountNumber);
+            cbTransferOtherFromAccount.getItems().add(accountsList.get(i).accountNumber);
             cbDepositFromAccount.getItems().add(accountsList.get(i).accountNumber);
         }
         headerText.setText(name+"s konton i banken");
+        comboMenu.getItems().clear();
         comboMenu.getItems().addAll(
                 "Öppna nytt konto",
                 "Uttag från konto",
@@ -265,11 +268,31 @@ public class MainController {
         );
     }
 
-    public void depositButtonClicked (Event e) {
-        if (depositAmount.getText() != null && !cbDepositFromAccount.getSelectionModel().isEmpty()) {
+    private void clearAllLists() {
+        myAccountList.getItems().clear();
+        cbDepositFromAccount.getItems().clear();
+        cbTransferFromAccount.getItems().clear();
+        cbTransferOtherFromAccount.getItems().clear();
+        cbTransferToAccount.getItems().clear();
+    }
+
+    public void depositButtonClicked (Event e) throws IOException {
+        if (!depositAmount.getText().isEmpty() && !cbDepositFromAccount.getSelectionModel().isEmpty()) {
+            for (int i = 0; i < accountsList.size(); i++) {
+                if (accountsList.get(i).accountNumber == Long.parseLong(cbDepositFromAccount.getValue().toString())) {
+                    if (accountsList.get(i).cashInAccount < Long.parseLong(depositAmount.getText())) {
+                        alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att ta ut beloppet!", "Bankomat");
+                        break;
+                    }
+                    Accounts updateAccount = new Accounts(accountsList.get(i).accountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - Long.parseLong(depositAmount.getText())));
+                    accountsList.set(i, updateAccount);
+                }
+            }
+            updateAccountListComboBoxes();
+            saveAccountsToFile();
             depositPopup.setVisible(true);
         } else {
-            alertPopup("Antingen har belopp eller uttagskonto inte angivits","Uttag från konto");
+            alertPopup("Antingen har belopp eller uttagskonto inte angivits","Bankomat");
         }
     }
 
@@ -290,7 +313,7 @@ public class MainController {
                 alert.showAndWait();
             }
         } else {
-          Alert alert = new Alert(Alert.AlertType.WARNING, "Du måste ha läst villkoren för kontot och kryssa i rutan!", ButtonType.OK);
+          Alert alert = new Alert(Alert.AlertType.WARNING, "Du måste ha läst villkoren för nytt konto!", ButtonType.OK);
           alert.showAndWait();
         }
     }
@@ -323,7 +346,7 @@ public class MainController {
         myAccountList.getItems().add(item);
         cbTransferFromAccount.getItems().add(newAccountNumber);
         cbTransferToAccount.getItems().add(newAccountNumber);
-        cbTransferFromAccountOther.getItems().add(newAccountNumber);
+        cbTransferOtherFromAccount.getItems().add(newAccountNumber);
         cbDepositFromAccount.getItems().add(newAccountNumber);
         saveNewAccountToFile(newAccountNumber, loggedinID,0);
         return true;

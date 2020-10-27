@@ -45,7 +45,7 @@ public class LoginController {
     public void loginButtonClicked(Event e) throws NoSuchAlgorithmException, IOException {
 
         fetchCustomers();
-
+        Boolean loginOk = false;
         for (int i=0; i<customersList.size(); i++) {
             StringBuilder sb = md5Pass(passwordField.getText());
             if (personalIDField.getText().equals(customersList.get(i).getPersonalID()) && customersList.get(i).passWd.equals(sb.toString())) {
@@ -58,8 +58,16 @@ public class LoginController {
                 MainController.mc.loginIn(customersList.get(i).getPersonalID(), customersList.get(i).firstName + " " + customersList.get(i).lastName);
                 personalIDField.setText("");
                 passwordField.setText("");
+                loginOk = true;
                 break;
+
             }
+        }
+        if (loginOk == false) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Du har angivit fel personnummer eller lösenord!", ButtonType.OK);
+            alert.setTitle("** M M B O S **");
+            alert.setHeaderText("Inloggning till banken");
+            alert.showAndWait();
         }
     }
 

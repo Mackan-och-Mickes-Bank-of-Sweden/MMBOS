@@ -87,7 +87,7 @@
                      <children>
                         <Button fx:id="doTransferOtherButton" onAction="#doTransferOtherButtonClicked" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" text="Utför" />
                         <TextField fx:id="transferAmountOther" layoutX="178.0" layoutY="81.0" prefHeight="27.0" prefWidth="104.0" promptText="Belopp" />
-                        <ComboBox fx:id="cbTransferFromAccountOther" layoutY="1.0" prefHeight="27.0" prefWidth="283.0" promptText="Från konto" />
+                        <ComboBox fx:id="cbTransferOtherFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="283.0" promptText="Från konto" />
                         <DatePicker fx:id="datepickerTransferOther" layoutY="119.0" prefHeight="27.0" prefWidth="217.0" promptText="Datum för överföring" />
                         <TextField fx:id="transferMessageOther" layoutY="81.0" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande / OCR" />
                         <TextField fx:id="toAccountOther" layoutY="38.0" prefHeight="27.0" prefWidth="283.0" promptText="Till konto / PG / BG" />
