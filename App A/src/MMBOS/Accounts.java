@@ -2,7 +2,7 @@ package MMBOS;
 
 public class Accounts {
     public long accountNumber;
-    private String personalID;
+    public String personalID;
     public double cashInAccount;
 
     public Accounts(long accountNumber, String personalID, double cashInAccount) {
@@ -11,7 +11,17 @@ public class Accounts {
         this.cashInAccount = cashInAccount;
     }
 
-    public String getPersonalID() {
-        return personalID;
+    public double getCash(){
+        return cashInAccount;
+    }
+
+    public double depositCash(double cash){
+        this.cashInAccount = this.cashInAccount + cash;
+        return this.cashInAccount;
+    }
+
+    public double withdrawlCash(double cash){
+        this.cashInAccount = this.cashInAccount - cash;
+        return this.cashInAccount;
     }
 }

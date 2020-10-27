@@ -5,14 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-
-import java.io.File;
 import java.util.HashMap;
 
 public class Main extends Application {
@@ -43,7 +38,6 @@ public class Main extends Application {
         setGlobalEventHandler(rootFirst);
 
     }
-
     /**
      * event handler for the keyboard's enter-button when logging in
      * @author Michael

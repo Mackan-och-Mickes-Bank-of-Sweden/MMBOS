@@ -39,7 +39,6 @@ public class MainController {
     @FXML private ComboBox cbTransferFromAccount;
     @FXML private ComboBox cbTransferToAccount;
     @FXML private Label headerText;
-    //@FXML private Button doTransferButton;
     @FXML private TextField transferMessage;
     @FXML private TextField transferAmount;
     @FXML private DatePicker datepickerTransfer;
@@ -50,16 +49,12 @@ public class MainController {
     @FXML private TextField transferMessageOther;
     @FXML private TextField toAccountOther;
     @FXML private TextField transferAmountOther;
-    //@FXML private MenuItem menuLoggaut;
     @FXML private Pane groupCreateNewAccount;
-    //@FXML private Button createNewAccountButton;
     @FXML private CheckBox checkboxCreateNewAccount;
     @FXML private Pane groupDeposit;
-    //@FXML private Button depositButton;
     @FXML private TextField depositAmount;
     @FXML private ComboBox cbDepositFromAccount;
     @FXML private AnchorPane depositPopup;
-    //@FXML private Button cashButton;
 
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
         LocalDate dateForTransfer;
@@ -158,6 +153,7 @@ public class MainController {
         }
         fw.close();
     }
+
     public void updateAccountListComboBoxes() {
         myAccountList.getItems().clear();
         for (int i = 0; i< accountsList.size(); i++) {
