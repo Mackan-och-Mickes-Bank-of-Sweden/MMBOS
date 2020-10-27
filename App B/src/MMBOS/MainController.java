@@ -274,19 +274,23 @@ public class MainController {
 
     public void depositButtonClicked (Event e) throws IOException {
         if (!depositAmount.getText().isEmpty() && !cbDepositFromAccount.getSelectionModel().isEmpty()) {
+            Boolean noCash = false;
             for (int i = 0; i < accountsList.size(); i++) {
                 if (accountsList.get(i).accountNumber == Long.parseLong(cbDepositFromAccount.getValue().toString())) {
                     if (accountsList.get(i).cashInAccount < Long.parseLong(depositAmount.getText())) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att ta ut beloppet!", "Bankomat");
+                        noCash = true;
                         break;
                     }
                     Accounts updateAccount = new Accounts(accountsList.get(i).accountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - Long.parseLong(depositAmount.getText())));
                     accountsList.set(i, updateAccount);
                 }
             }
-            updateAccountListComboBoxes();
-            saveAccountsToFile();
-            depositPopup.setVisible(true);
+            if (noCash == false) {
+                updateAccountListComboBoxes();
+                saveAccountsToFile();
+                depositPopup.setVisible(true);
+            }
         } else {
             alertPopup("Antingen har belopp eller uttagskonto inte angivits","Bankomat");
         }

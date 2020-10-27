@@ -25,7 +25,7 @@ public class LoginController {
         lc = this;
     }
     Main main;
-    public static File customersFile = new File("../files/customers.cus");
+    public static File customersFile = new File("files/customers.cus");
     public static ArrayList <Customers> customersList = new ArrayList<>();
     public static String sessionName;
 
