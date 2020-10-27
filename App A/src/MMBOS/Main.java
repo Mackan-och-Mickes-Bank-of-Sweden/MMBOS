@@ -25,12 +25,12 @@ public class Main {
     public static int bankID = -1;
     public static String menuFormater = "%-10s %-25s\n";
     public static Scanner keyBoard = new Scanner(System.in);
-    public static File customersFile = new File("../files/customers.cus");
-    public static File accountsFile = new File("../files/accounts.acc");
-    public static File pendingPaymentsFile = new File("../files/pendingpayments.pay");
-    public static File nextAccountNumber = new File("../files/nextaccountnumber.acc");
-    public static File transferLogFile = new File("../logs/transfers.log");
-    public static File hashtoryFile = new File("../logs/hashtory.log");
+    public static File customersFile = new File("files/customers.cus");
+    public static File accountsFile = new File("files/accounts.acc");
+    public static File pendingPaymentsFile = new File("files/pendingpayments.pay");
+    public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
+    public static File transferLogFile = new File("logs/transfers.log");
+    public static File hashtoryFile = new File("logs/hashtory.log");
     public static int nextAccountNumb;
     public static String newAccountNumber;
     public static ArrayList<Payments> paymentsList = new ArrayList<>();
