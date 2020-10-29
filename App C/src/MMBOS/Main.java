@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
@@ -18,7 +17,6 @@ public class Main {
     public static File pendingPaymentsFile = new File("files/pendingpayments.pay");
     public static File transferLogFile = new File("logs/transfers.log");
     public static File hashtoryFile = new File("logs/hashtory.log");
-    public static ArrayList<Block> blockchain = new ArrayList<>(); //BlockChain...
     public static int numOfZerosInHash = 3;
     public static ArrayList<BlockCheck> blockChecker = new ArrayList<>();
 
@@ -34,29 +32,33 @@ public class Main {
                     Thread.sleep(1000);
                 }
             }
+            Thread.sleep(1000);
         }
     }
 
+    /**
+     * method to check if hash chain is valid, returns true/false
+     * @author Michael
+     * @return
+     */
     public static Boolean isChainValid() {
         BlockCheck currentBlock;
         BlockCheck previousBlock;
         String zeros = new String(new char[numOfZerosInHash]).replace('\0', '0');
-
-        //loop through blockchain to check hashes:
         for (int i = 1; i < blockChecker.size(); i++) {
             currentBlock = blockChecker.get(i);
             previousBlock = blockChecker.get(i - 1);
-            //compare registered hash and calculated hash:
+
             if (!currentBlock.hash.equals(currentBlock.calculateHashChecker())) {
                 System.out.println("Nuvarande hash är korrupt.");
                 return false;
             }
-            //compare previous hash and registered previous hash
+
             if (!previousBlock.hash.equals(currentBlock.previousHash)) {
                 System.out.println("Föregåene hash är korrupt.");
                 return false;
             }
-            //check if hash is solved
+
             if (!currentBlock.hash.substring(0, numOfZerosInHash).equals(zeros)) {
                 System.out.println("Denna hash kunde inte lösas.");
                 return false;
@@ -65,6 +67,16 @@ public class Main {
         return true;
     }
 
+    /**
+     * fetch previous hash from log and check against transfer log
+     * add new transfers to log file, hash to log file and perform hash check
+     * @author Michael
+     * @param fromAccount
+     * @param toAccount
+     * @param transferAmount
+     * @param transferMessage
+     * @throws FileNotFoundException
+     */
     private static void checkTransferHash(String fromAccount, String toAccount, double transferAmount, String transferMessage) throws FileNotFoundException {
         Scanner checkTransfersFile = new Scanner(transferLogFile);
         Scanner checkHashtoryFile = new Scanner(hashtoryFile);
@@ -95,8 +107,7 @@ public class Main {
     }
 
     /**
-     * fetch all the loged in user's accounts from csv file -> customersAccountsList
-     * fetch all existing accounts from csv file -> allAccountsList
+     * fetch all accounts from csv file
      * @author Michael
      */
     public static void fetchAccounts() {
@@ -106,7 +117,6 @@ public class Main {
             while (accountsFileReader.hasNextLine()) {
                 String rowsFromFile = accountsFileReader.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
-                Accounts readAccountforAll = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
                 Accounts readAccount = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
                 accountsList.add(readAccount);
             }
