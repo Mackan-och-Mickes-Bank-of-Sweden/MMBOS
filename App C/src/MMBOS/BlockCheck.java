@@ -1,4 +1,7 @@
 package MMBOS;
+
+import java.util.Date;
+
 /**
  * Kontrollerar loggade hashar med alla överföringas-hashar
  *
@@ -10,14 +13,20 @@ public class BlockCheck {
     public String hash;
     public String previousHash;
     private String data;
-    public String settimeStamp;
-    public String setNonce;
+    public long settimeStamp;
+    public int setNonce;
 
-    public BlockCheck(String data, String previousHash, String timeStamp, String setNonce) {
+    public BlockCheck(String data, String previousHash, long timeStamp, int setNonce) {
         this.data = data;
         this.previousHash = previousHash;
         this.settimeStamp = timeStamp;
         this.setNonce = setNonce;
+        this.hash = calculateHashChecker();
+    }
+    public BlockCheck(String data, String previousHash ) {
+        this.data = data;
+        this.previousHash = previousHash;
+        this.settimeStamp = new Date().getTime();
         this.hash = calculateHashChecker();
     }
 
@@ -31,6 +40,13 @@ public class BlockCheck {
         return calculatedhashCheck;
     }
 
+    public void mineBlock(int difficulty) {
+        String target = new String(new char[difficulty]).replace('\0', '0'); //Create a string with difficulty * "0"
+        while(!hash.substring( 0, difficulty).equals(target)) {
+            setNonce ++;
+            hash = calculateHashChecker();
+        }
+    }
     public String getData() {
         return data;
     }

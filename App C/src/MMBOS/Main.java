@@ -24,43 +24,30 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         for (int i = 0; i > -1; i++) {
-            Thread.sleep(5000);
-
             Scanner pendingPayments = new Scanner(pendingPaymentsFile);
             while (pendingPayments.hasNextLine()) {
                 String rowsFromFile = pendingPayments.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
                 if (readerParts[3].equals(String.valueOf(LocalDate.now()))) {
                     System.out.println("Överföring från: " + readerParts[0] + " till: " + readerParts[1] + " utförs");
-                    saveTransferToLogfile(readerParts[0], readerParts[1], readerParts[2], readerParts[4]);
-                    saveTransferData(readerParts[0]+";"+readerParts[1]+";"+readerParts[2]+";"+readerParts[4]);
-                    Thread.sleep(500);
+                    checkTransferHash(readerParts[0], readerParts[1], Double.parseDouble(readerParts[2]), readerParts[4]);
+                    Thread.sleep(1000);
                 }
             }
-            checkTransferHash();
-        }
-    }
-
-    public static void saveTransferToLogfile(String fromaccount, String toaccount, String amount, String message) {
-        try {
-            Files.write(Paths.get(String.valueOf(transferLogFile)), (fromaccount+";"+toaccount+";"+amount+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
-        }
-        catch (Exception e) {
-            System.out.println("Problem vid skrivning till transferfil");
         }
     }
 
     public static Boolean isChainValid() {
-        Block currentBlock;
-        Block previousBlock;
-        String hashTarget = new String(new char[numOfZerosInHash]).replace('\0', '0');
+        BlockCheck currentBlock;
+        BlockCheck previousBlock;
+        String zeros = new String(new char[numOfZerosInHash]).replace('\0', '0');
 
         //loop through blockchain to check hashes:
-        for (int i = 1; i < blockchain.size(); i++) {
-            currentBlock = blockchain.get(i);
-            previousBlock = blockchain.get(i - 1);
+        for (int i = 1; i < blockChecker.size(); i++) {
+            currentBlock = blockChecker.get(i);
+            previousBlock = blockChecker.get(i - 1);
             //compare registered hash and calculated hash:
-            if (!currentBlock.hash.equals(currentBlock.calculateHash())) {
+            if (!currentBlock.hash.equals(currentBlock.calculateHashChecker())) {
                 System.out.println("Nuvarande hash är korrupt.");
                 return false;
             }
@@ -70,63 +57,41 @@ public class Main {
                 return false;
             }
             //check if hash is solved
-            if (!currentBlock.hash.substring(0, numOfZerosInHash).equals(hashTarget)) {
-                System.out.println("Detta block har inte hämtats.");
+            if (!currentBlock.hash.substring(0, numOfZerosInHash).equals(zeros)) {
+                System.out.println("Denna hash kunde inte lösas.");
                 return false;
             }
         }
         return true;
     }
 
-    private static void checkTransferHash() throws FileNotFoundException {
+    private static void checkTransferHash(String fromAccount, String toAccount, double transferAmount, String transferMessage) throws FileNotFoundException {
         Scanner checkTransfersFile = new Scanner(transferLogFile);
         Scanner checkHashtoryFile = new Scanner(hashtoryFile);
-
+        blockChecker.clear();
+        String dataString = fromAccount+";"+toAccount+";"+transferAmount+";"+transferMessage;
+        String previousHash = "";
+        int i = 0;
         while (checkTransfersFile.hasNextLine()) {
             String rowsFromFile = checkTransfersFile.nextLine();
             String rowsFromHashtory = checkHashtoryFile.nextLine();
             String[] readerHashParts = rowsFromHashtory.split(";");
-            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2],readerHashParts[3]));
-        }
-        //String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
-        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
-    }
-
-    private static void saveTransferData(String data) throws FileNotFoundException {
-        Scanner checkTransfersFile = new Scanner(transferLogFile);
-        String previousHash;
-        int i = 0;
-        while (checkTransfersFile.hasNextLine()) {
-            try {
-                previousHash = blockchain.get(blockchain.size() - 1).hash;
-
-            } catch (Exception e) {
-                previousHash = "0";
-            }
-            String rowsFromFile = checkTransfersFile.nextLine();
-            blockchain.add(new Block(rowsFromFile, previousHash));
-            System.out.println("Hash av block "+i+" . . .");
-            blockchain.get(i).mineBlock(numOfZerosInHash);
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], Long.parseLong(readerHashParts[2]), Integer.parseInt(readerHashParts[3])));
+            previousHash = readerHashParts[0];
             i++;
         }
-        i--;
-        //previousHash = blockchain.get(blockchain.size()).previousHash;
-        //System.out.print(previousHash);
-        //blockchain.add(new Block(data,previousHash));
-        //blockchain.get(blockchain.size()).mineBlock(numOfZerosInHash);
-    System.out.print(blockchain.get(i).previousHash+";"+blockchain.get(i).hash+";"+blockchain.get(i).getTimeStamp()+";"+blockchain.get(i).getNonce()+"\n");
+        blockChecker.add(new BlockCheck(dataString, previousHash));
+        blockChecker.get(i).mineBlock(numOfZerosInHash);
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
         try {
-            Files.write(Paths.get(String.valueOf(hashtoryFile)), (blockchain.get(i).previousHash+";"+blockchain.get(i).hash+";"+blockchain.get(i).getTimeStamp()+";"+blockchain.get(i).getNonce()+"\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(String.valueOf(hashtoryFile)), (blockChecker.get(i).hash+";"+blockChecker.get(i).previousHash+";"+blockChecker.get(i).settimeStamp+";"+blockChecker.get(i).setNonce+"\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(String.valueOf(transferLogFile)), (dataString+"\n").getBytes(), StandardOpenOption.APPEND);
         }
         catch (Exception e) {
-            System.out.println("Problem vid skrivning till transferfil");
+            System.out.println("Problem vid skrivning till log filer");
         }
-
-       // System.out.println("\nBlockchain är giltig: " + isChainValid());
-
-        //String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        //System.out.println("\nThe block chain: ");
-        //System.out.println(blockchainJson);
+        System.out.print(blockchainJson);
+        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
     }
 
     /**
