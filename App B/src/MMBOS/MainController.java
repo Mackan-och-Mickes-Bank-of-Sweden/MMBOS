@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.function.UnaryOperator;
 
 public class MainController {
     public static MainController mc;
@@ -262,6 +263,20 @@ public class MainController {
                 "Gör en överföring mellan egna konton",
                 "Gör en betalning till annans konto"
         );
+
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String text = change.getText();
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        TextFormatter<String> textFormatter2 = new TextFormatter<>(filter);
+        TextFormatter<String> textFormatter3 = new TextFormatter<>(filter);
+        transferAmount.setTextFormatter(textFormatter);
+        transferAmountOther.setTextFormatter(textFormatter2);
+        depositAmount.setTextFormatter(textFormatter3);
     }
 
     private void clearAllLists() {
