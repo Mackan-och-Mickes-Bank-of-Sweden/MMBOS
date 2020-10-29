@@ -92,7 +92,7 @@ public class MainController {
                 message = transferMessage.getText();
             }
             try {
-                Files.write(Paths.get("../files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
                 alertPopup("Överföringen har lagts till och kommer att genomföras det valda datumet","Kontoöverföring");
             }
             catch (Exception e) {
