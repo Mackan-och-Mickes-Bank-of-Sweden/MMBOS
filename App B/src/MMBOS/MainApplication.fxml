@@ -85,7 +85,7 @@
                   </Pane>
                   <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
-                        <Button fx:id="doTransferOtherButton" onAction="#doTransferOtherButtonClicked" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" text="Utför" />
+                        <Button fx:id="doTransferOtherButton" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" onAction="#doTransferOtherButtonClicked" text="Utför" />
                         <TextField fx:id="transferAmountOther" layoutX="178.0" layoutY="81.0" prefHeight="27.0" prefWidth="104.0" promptText="Belopp" />
                         <ComboBox fx:id="cbTransferOtherFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="283.0" promptText="Från konto" />
                         <DatePicker fx:id="datepickerTransferOther" layoutY="119.0" prefHeight="27.0" prefWidth="217.0" promptText="Datum för överföring" />
@@ -104,8 +104,8 @@
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="62.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="53.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />

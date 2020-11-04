@@ -22,6 +22,7 @@ import java.util.Scanner;
 public class Main {
     public static File accountsFile = new File("files/accounts.acc");
     public static File pendingPaymentsFile = new File("files/pendingpayments.pay");
+    public static File paymentProblemsFile = new File("files/paymentproblems.pay");
     public static File transferLogFile = new File("logs/transfers.log");
     public static File hashtoryFile = new File("logs/hashtory.log");
     public static int numOfZerosInHash = 3;
@@ -48,6 +49,12 @@ public class Main {
                     } else {
                         Pending laterDate = new Pending(pendingPayments.get(j).fromAccount, pendingPayments.get(j).toAccount, pendingPayments.get(j).transferAmount, String.valueOf(LocalDate.now().plusDays(1)), pendingPayments.get(j).transferMessage);
                         pendingPayments.set(j,laterDate);
+                        try {
+                            Files.write(Paths.get(String.valueOf(paymentProblemsFile)), (pendingPayments.get(j).fromAccount+";"+pendingPayments.get(j).toAccount+";"+pendingPayments.get(j).transferAmount+";"+pendingPayments.get(j).transferDate+";"+String.valueOf(LocalDate.now().plusDays(1))+";"+pendingPayments.get(j).transferMessage+";"+"1\n").getBytes(), StandardOpenOption.APPEND);
+                        }
+                        catch (Exception e) {
+                            System.out.println("Problem vid skrivning till payementproblems.pay");
+                        }
                         System.out.println("Transaktion från konto: " + pendingPayments.get(j).fromAccount + " till konto: " + pendingPayments.get(j).toAccount + " kunde inte genomföras pga otillräckligt saldo, nytt försök " +  String.valueOf(LocalDate.now().plusDays(1)));
                     }
                     Thread.sleep(1000); //Utför en transaktion per sekund utav de som faller på dagens datum.

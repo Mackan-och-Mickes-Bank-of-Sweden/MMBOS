@@ -31,8 +31,10 @@ public class MainController {
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
     public static String loggedinID;
     public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
+    public static File paymentProblemsFile = new File("files/paymentproblems.pay");
     public static int nextAccountNumb;
     public static String newAccountNumber;
+    public static String newPaymenyDate;
 
     @FXML private Label loggedinText;
     @FXML private ListView myAccountList;
@@ -245,6 +247,9 @@ public class MainController {
         myAccountList.setPrefWidth(300);
         for (int i = 0; i< accountsList.size(); i++) {
             if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
+            if (fetchMessages(String.valueOf(accountsList.get(i).accountNumber))) {
+                alertPopup("Du har schemalagt en överföring från konto: "+accountsList.get(i).accountNumber+" som inte kunde genomföras. Nytt försök kommer att göras "+newPaymenyDate,"Otillräckliga medel på kontot");
+            }
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tDisponibelt belopp: "
@@ -384,8 +389,7 @@ public class MainController {
     }
 
     /**
-     * fetch all the loged in user's accounts from csv file -> customersAccountsList
-     * fetch all existing accounts from csv file -> allAccountsList
+     * fetch all existing accounts from csv file -> accountsList
      * @author Michael
      */
     public static void fetchAccounts() {
@@ -395,7 +399,6 @@ public class MainController {
             while (accountsFileReader.hasNextLine()) {
                 String rowsFromFile = accountsFileReader.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
-                Accounts readAccountforAll = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
                 Accounts readAccount = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
                 accountsList.add(readAccount);
             }
@@ -403,6 +406,20 @@ public class MainController {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
             return;
         }
+    }
+    public static boolean fetchMessages(String fromAccount) {
+        try {
+            Scanner fr = new Scanner(paymentProblemsFile);
+            while (fr.hasNextLine()) {
+                String rowsFromFile = fr.nextLine();
+                String[] readerParts = rowsFromFile.split(";");
+                newPaymenyDate = readerParts[3];
+                if (readerParts[0].equals(fromAccount)) return true;
+            }
+        } catch (Exception e) {
+            System.out.print(e.getMessage() +"\n" + e.getStackTrace());
+        }
+        return false;
     }
 
     /**
