@@ -32,9 +32,9 @@ public class MainController {
     public static String loggedinID;
     public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
     public static File paymentProblemsFile = new File("files/paymentproblems.pay");
+    public static ArrayList <TransferMessages> transferFailMassages = new ArrayList<>();
     public static int nextAccountNumb;
     public static String newAccountNumber;
-    public static String newPaymenyDate;
 
     @FXML private Label loggedinText;
     @FXML private ListView myAccountList;
@@ -237,18 +237,23 @@ public class MainController {
      * @param passingInfo personalID from login controller
      * @param name loged in persons firstname and lastname
      */
-    public void loginIn(String passingInfo, String name) {
+    public void loginIn(String passingInfo, String name) throws IOException {
         hideAllGroups();
         clearAllLists();
         loggedinText.setText(passingInfo);
         loggedinText.setVisible(false);
         loggedinID=passingInfo;
         fetchAccounts();
+        fetchTransferFailMessages();
         myAccountList.setPrefWidth(300);
         for (int i = 0; i< accountsList.size(); i++) {
             if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
-            if (fetchMessages(String.valueOf(accountsList.get(i).accountNumber))) {
-                alertPopup("Du har schemalagt en överföring från konto: "+accountsList.get(i).accountNumber+" som inte kunde genomföras. Nytt försök kommer att göras "+newPaymenyDate,"Otillräckliga medel på kontot");
+            for (int j = 0; j< transferFailMassages.size(); j++) {
+                if (transferFailMassages.get(j).fromAccount.equals(String.valueOf(accountsList.get(i).accountNumber))) {
+                    alertPopup("Du har schemalagt en överföring från konto: " + accountsList.get(i).accountNumber + " som inte kunde genomföras "+ transferFailMassages.get(j).orgDate +". Nytt försök kommer att göras " + transferFailMassages.get(j).newDate, "Otillräckliga medel på kontot");
+                    transferFailMassages.remove(j);
+                    updateTransferFailFile();
+                }
             }
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
@@ -407,19 +412,37 @@ public class MainController {
             return;
         }
     }
-    public static boolean fetchMessages(String fromAccount) {
+    public static void fetchTransferFailMessages() {
         try {
             Scanner fr = new Scanner(paymentProblemsFile);
+            transferFailMassages.clear();
             while (fr.hasNextLine()) {
                 String rowsFromFile = fr.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
-                newPaymenyDate = readerParts[3];
-                if (readerParts[0].equals(fromAccount)) return true;
+                TransferMessages tm = new TransferMessages(readerParts[0], readerParts[1], Double.parseDouble(readerParts[2]), readerParts[3], readerParts[4], readerParts[5], Integer.parseInt(readerParts[6]));
+                transferFailMassages.add(tm);
             }
         } catch (Exception e) {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
         }
-        return false;
+    }
+    public static void updateTransferFailFile() throws IOException {
+        try {
+            FileWriter fw = new FileWriter(paymentProblemsFile);
+            for (int i=0; i< transferFailMassages.size(); i++) {
+                TransferMessages tm = transferFailMassages.get(i);
+                fw.write(tm.fromAccount+";"
+                +tm.toAccount+";"
+                +tm.transferAmount+";"
+                +tm.orgDate+";"
+                +tm.newDate+";"
+                +tm.transferMessage+";"
+                +tm.messageID+"/n");
+            }
+            fw.close();
+        } catch (Exception e) {
+
+        }
     }
 
     /**

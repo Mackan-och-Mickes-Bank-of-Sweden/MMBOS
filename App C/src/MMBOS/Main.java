@@ -53,7 +53,7 @@ public class Main {
                             Files.write(Paths.get(String.valueOf(paymentProblemsFile)), (pendingPayments.get(j).fromAccount+";"+pendingPayments.get(j).toAccount+";"+pendingPayments.get(j).transferAmount+";"+pendingPayments.get(j).transferDate+";"+String.valueOf(LocalDate.now().plusDays(1))+";"+pendingPayments.get(j).transferMessage+";"+"1\n").getBytes(), StandardOpenOption.APPEND);
                         }
                         catch (Exception e) {
-                            System.out.println("Problem vid skrivning till payementproblems.pay");
+                            System.out.println("Problem vid skrivning till paymentproblems.pay");
                         }
                         System.out.println("Transaktion från konto: " + pendingPayments.get(j).fromAccount + " till konto: " + pendingPayments.get(j).toAccount + " kunde inte genomföras pga otillräckligt saldo, nytt försök " +  String.valueOf(LocalDate.now().plusDays(1)));
                     }
