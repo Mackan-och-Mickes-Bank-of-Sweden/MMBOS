@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import com.google.gson.GsonBuilder;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class Main {
     // Globala variabler
@@ -52,15 +53,16 @@ public class Main {
 
         while (true) {
             String headMenuChoice = printHeadMenu();
+// Menyval 0 : Avslutar program
             if (headMenuChoice.equals("0")) {
                 System.out.println("Programmet avslutas. . .");
                 break;
             }
-
-            if (headMenuChoice.equals("1")){
+// Menyval 1 : Logga ut
+            if (headMenuChoice.equals("1")) {
                 logout();
             }
-
+// Menyval 2 : Skapa ny kund
             if (headMenuChoice.equals("2")) {
                 createNewCustomer();
             }
@@ -90,27 +92,27 @@ public class Main {
                 listAccounts();
             }
 
-// TODO: Insättningar
+// Menyval 6 : Sätt in pengar
             if (headMenuChoice.equals("6")) {
                 depositCash();
             }
 
-// TODO: Uttag
+// Menyval 7 : Ta ut pengar
             if (headMenuChoice.equals("7")) {
                 withdrawalCash();
             }
 
-// TODO: Betalningsuppdrag
+// Menyval 8 : Betalningsuppdrag
             if (headMenuChoice.equals("8")) {
                 paymentOrders();
             }
 
-// TODO: Banktillgångar
+// Menyval 9 : Visa bankvalv
             if (headMenuChoice.equals("9")) {
                 showBankVault();
             }
 
-// TODO: Överföringar
+// Menyval 10 : Överför pengar mellan konton
             if (headMenuChoice.equals("10")) {
                 transferCash();
             }
@@ -121,21 +123,21 @@ public class Main {
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
-
+// Menyval 12 : Logga in
             if (headMenuChoice.equals("12")) {
                 login();
             }
-
-            if (headMenuChoice.equals("13")){
+// Menyval 13 : Ta bort betalningsuppdrag
+            if (headMenuChoice.equals("13")) {
                 removePaymentOrder();
             }
-
-            if(headMenuChoice.equals("14")){
+//Menyval 14 : Används utav Accountant enumen
+            if (headMenuChoice.equals("14")) {
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
-
-            if (headMenuChoice.equals("15")){
+//Menyval 15 : Används vid felaktik inmatning
+            if (headMenuChoice.equals("15")) {
                 System.out.println("Felaktig inmatning.");
             }
         }
@@ -149,7 +151,7 @@ public class Main {
             String rowsFromFile = checkTransfersFile.nextLine();
             String rowsFromHashtory = checkHashtoryFile.nextLine();
             String[] readerHashParts = rowsFromHashtory.split(";");
-            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2],readerHashParts[3]));
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2], readerHashParts[3]));
         }
         String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
         if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
@@ -168,7 +170,7 @@ public class Main {
             }
             String rowsFromFile = checkTransfersFile.nextLine();
             blockchain.add(new Block(rowsFromFile, previousHash));
-            System.out.println("Hash av block "+i+" . . .");
+            System.out.println("Hash av block " + i + " . . .");
             blockchain.get(i).mineBlock(numOfZerosInHash);
             i++;
         }
@@ -191,27 +193,28 @@ public class Main {
     }
 
     private static void createNewAccount() {
-        Random randomizer = new Random();
-        String randomAccount = "";
-        for (int i = 0; i < 5; i++) {
-            randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
-        }
-        newAccountNumber = nextAccountNumb + randomAccount;
         listCustomers();
-        // TODO: Lista med id och tilldela personnummer till nytt konto.
         System.out.print("\nAnge POS som kontot skall tilldelas: ");
         String customerID = keyBoard.nextLine();
         boolean term;
-        try{
+        try {
             Integer.parseInt(customerID);
             term = true;
-        } catch(Exception e){
+        } catch (Exception e) {
             term = false;
         }
-        if(term) {
+
+        if (term) {
+            Random randomizer = new Random();
+            String randomAccount = "";
+            for (int i = 0; i < 5; i++) {
+                randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
+            }
+            newAccountNumber = nextAccountNumb + randomAccount;
+
             Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(Integer.parseInt(customerID)).getPersonalID(), 0);
             accountsList.add(addAccount);
-        } else{
+        } else {
             System.out.println("Felaktig inmatning.");
         }
     }
@@ -234,14 +237,14 @@ public class Main {
 
         try {
             FileWriter myWriter = new FileWriter(pendingPaymentsFile);
-            for(int i = 0; i < paymentsList.size(); i++){
+            for (int i = 0; i < paymentsList.size(); i++) {
                 Payments p = paymentsList.get(i);
                 myWriter.write(p.fromAccount + ";" + p.toAccount + ";" + p.moneyAmount + ";"
                         + p.day +
                         "\n");
             }
             myWriter.close();
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Problem vid inskrivning av paymentorders.");
         }
     }
@@ -260,7 +263,7 @@ public class Main {
     private static String printHeadMenu() {
         //Code by Marcus
         String headMenuChoise;
-        if(bankID < 0){
+        if (bankID < 0) {
             System.out.println("       M & M Bank of Sweden       ");
             System.out.format("%34s\n", "----------------------------------");
             System.out.format(menuFormater, "[1]", "logga in");
@@ -268,10 +271,10 @@ public class Main {
             System.out.format(menuFormater, "[0]", "Avsluta programmet");
             System.out.print("\nMenyval: ");
             headMenuChoise = headMenuCheck();
-            if(Integer.parseInt(headMenuChoise) > 1){
+            if (Integer.parseInt(headMenuChoise) > 1) {
                 headMenuChoise = "15";
             }
-            if(Integer.parseInt(headMenuChoise) == 1){
+            if (Integer.parseInt(headMenuChoise) == 1) {
                 headMenuChoise = "12";
             }
 
@@ -295,9 +298,9 @@ public class Main {
                 System.out.format(menuFormater, "[0]", "Avsluta programmet");
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
-                if(Integer.parseInt(headMenuChoise) > 11){
+                if (Integer.parseInt(headMenuChoise) > 11) {
                     headMenuChoise = "15";
-                } else if(Integer.parseInt(headMenuChoise) == 9){
+                } else if (Integer.parseInt(headMenuChoise) == 9) {
                     headMenuChoise = "13";
                 }
 
@@ -312,11 +315,11 @@ public class Main {
                 System.out.format(menuFormater, "[0]", "Avsluta programmet");
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
-                if(Integer.parseInt(headMenuChoise) > 3){
+                if (Integer.parseInt(headMenuChoise) > 3) {
                     headMenuChoise = "15";
-                } else if(Integer.parseInt(headMenuChoise) == 2){
+                } else if (Integer.parseInt(headMenuChoise) == 2) {
                     headMenuChoise = "4";
-                } else if(Integer.parseInt(headMenuChoise) == 3){
+                } else if (Integer.parseInt(headMenuChoise) == 3) {
                     headMenuChoise = "5";
                 }
 
@@ -330,26 +333,21 @@ public class Main {
                 System.out.format(menuFormater, "[4]", "Lista alla kunder");
                 System.out.format(menuFormater, "[5]", "Lista alla konton");
                 System.out.format(menuFormater, "[6]", "Insättningar");
-                System.out.format(menuFormater, "[7]", "Uttag");
-                System.out.format(menuFormater, "[8]", "Betalningsuppdrag (OCR)");
-                System.out.format(menuFormater, "[9]", "Ta bort betalningsuppdrag");
-                System.out.format(menuFormater, "[10]", "Överföringar");
+                System.out.format(menuFormater, "[7]", "Betalningsuppdrag (OCR)");
+                System.out.format(menuFormater, "[8]", "Ta bort betalningsuppdrag");
                 System.out.format("%34s\n", "----------------------------------");
                 System.out.format(menuFormater, "[0]", "Avsluta programmet");
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
-                if(Integer.parseInt(headMenuChoise) > 10){
+                if (Integer.parseInt(headMenuChoise) > 8) {
                     headMenuChoise = "15";
-                }
-                else if(Integer.parseInt(headMenuChoise) == 6){
+                } else if (Integer.parseInt(headMenuChoise) == 6) {
                     accountantDeposit();
                     headMenuChoise = "14";
-                }
-                else if(Integer.parseInt(headMenuChoise) == 8){
+                } else if (Integer.parseInt(headMenuChoise) == 7) {
                     accountantPaymentorders();
                     headMenuChoise = "14";
-                }
-                else if(Integer.parseInt(headMenuChoise) == 9){
+                } else if (Integer.parseInt(headMenuChoise) == 8) {
                     headMenuChoise = "13";
                 }
 
@@ -368,17 +366,17 @@ public class Main {
                 System.out.format(menuFormater, "[0]", "Avsluta programmet");
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
-                if(Integer.parseInt(headMenuChoise) > 6){
+                if (Integer.parseInt(headMenuChoise) > 6) {
                     headMenuChoise = "15";
-                } else if(Integer.parseInt(headMenuChoise) == 2){
+                } else if (Integer.parseInt(headMenuChoise) == 2) {
                     headMenuChoise = "3";
-                } else if(Integer.parseInt(headMenuChoise) == 3){
+                } else if (Integer.parseInt(headMenuChoise) == 3) {
                     headMenuChoise = "6";
-                } else if(Integer.parseInt(headMenuChoise) == 4){
+                } else if (Integer.parseInt(headMenuChoise) == 4) {
                     headMenuChoise = "7";
-                } else if(Integer.parseInt(headMenuChoise) == 5){
+                } else if (Integer.parseInt(headMenuChoise) == 5) {
                     headMenuChoise = "8";
-                } else if(Integer.parseInt(headMenuChoise) == 6){
+                } else if (Integer.parseInt(headMenuChoise) == 6) {
                     headMenuChoise = "10";
                 }
 
@@ -389,18 +387,16 @@ public class Main {
         return headMenuChoise;
     }
 
-    private static String headMenuCheck(){
+    private static String headMenuCheck() {
         //Code by Marcus
         String menu;
         boolean term;
         do {
-            term = false;
             menu = keyBoard.nextLine();
-            try {
-                Integer.parseInt(menu);
-            } catch (Exception e) {
-                System.out.println("You need to enter integers. . .");
-                term = true;
+            term = checkInput(menu);
+            if (term){
+            System.out.println("Felaktig inmatning. . .");
+            System.out.print("Menyval: ");
             }
         } while (term);
         return menu;
@@ -437,17 +433,17 @@ public class Main {
         }
     }
 
-    private static void fetchPaymentOrders(){
-        try{
+    private static void fetchPaymentOrders() {
+        try {
             Scanner paymentOrderReader = new Scanner(pendingPaymentsFile);
-            while(paymentOrderReader.hasNextLine()){
+            while (paymentOrderReader.hasNextLine()) {
                 String rowsFromFile = paymentOrderReader.nextLine();
                 String[] readerparts = rowsFromFile.split(";");
                 Payments payments = new Payments(readerparts[0], readerparts[1], readerparts[2], readerparts[3]);
                 paymentsList.add(payments);
             }
             paymentOrderReader.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
     }
@@ -510,14 +506,14 @@ public class Main {
     Code by Marcus
      */
 
-    public static void listAccounts(){
+    public static void listAccounts() {
 
         String accountFormat = "%-15s %10.2f %-15s %-20s\n";
         System.out.println("\nListar alla konton på banken");
         System.out.format("%-15s %10s %-15s %-20s\n", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
         for (int j = 0; j < customersList.size(); j++) {
-            for(int i = 0; i < accountsList.size(); i++) {
-                if(customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
+            for (int i = 0; i < accountsList.size(); i++) {
+                if (customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
                     System.out.format(accountFormat, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
                                     + " " + String.valueOf(accountsList.get(i).accountNumber).substring(4, 6) +
                                     " " + String.valueOf(accountsList.get(i).accountNumber).substring(6),
@@ -532,20 +528,19 @@ public class Main {
 
     public static void createNewCustomer() throws NoSuchAlgorithmException {
 
-        System.out.print("Enter first name: ");
+        System.out.print("Skriv in förnamn: ");
         String firstname = keyBoard.nextLine();
-        System.out.print("Enter lastname: ");
+        System.out.print("Skriv in efternamn: ");
         String lastname = keyBoard.nextLine();
-        System.out.print("Enter birth ID: ");
+        System.out.print("Skriv in personnummer(12 siffror): ");
         String personID = keyBoard.nextLine();
-        System.out.print("Enter new password: ");
+        System.out.print("Skriv in nytt lösenord: ");
         String password1 = keyBoard.nextLine();
-        System.out.print("Enter new password again: ");
+        System.out.print("Skriv in nytt lösenord igen: ");
         String password2 = keyBoard.nextLine();
 
-
         boolean term;
-        if (password1.equals(password2)) {
+        if (password1.equals(password2) && personID.length() == 12) {
             try {
                 term = checkID(personID);
             } catch (Exception e) {
@@ -557,11 +552,9 @@ public class Main {
                 Customers newCustomer = new Customers(personID, firstname, lastname, String.valueOf(md5Pass(password1)), role);
                 customersList.add(newCustomer);
             }
-
         } else {
-            System.out.println("Enter the same password twice.");
+            System.out.println("Ogiltigt personnummer/Ogiltligt lösenord.");
         }
-
     }
 
     public static boolean checkID(String personID) {
@@ -592,98 +585,106 @@ public class Main {
         int modulus = ((10 - (sum % 10)) % 10);
 
         if (Integer.toString(modulus).equals(String.valueOf(controllnr[11]))) {
-            System.out.println("Successfully created new account!");
+            System.out.println("Skapdae nytt kund konto!");
             return true;
         } else {
-            System.out.println("Invalid controllnumber.");
+            System.out.println("Ogiltlig kontrollsiffra...");
             return false;
         }
     }
 
     public static void login() throws NoSuchAlgorithmException {
 
-        System.out.println("Login to your account");
+        System.out.println("Logga in till ditt konto");
 
-        System.out.print("Enter birth ID: ");
+        System.out.print("Skriv in personnummer: ");
         String birthID = keyBoard.nextLine();
-        System.out.print("Enter password: ");
+        System.out.print("Skriv in lösenord: ");
         String password = keyBoard.nextLine();
 
         boolean term = true;
         for (int i = 0; i < customersList.size(); i++) {
             if (customersList.get(i).getPersonalID().equals(birthID)) {
                 if (customersList.get(i).passWd.equals(String.valueOf(md5Pass(password)))) {
-                    System.out.println("Welcome " + customersList.get(i).firstName + " " + customersList.get(i).lastName + "!");
+                    System.out.println("Välkommen " + customersList.get(i).firstName + " " + customersList.get(i).lastName + "!");
                     bankID = i;
                     term = false;
                 }
             }
         }
         if (term) {
-            System.out.println("Wrong ID and/or password. . .");
+            System.out.println("Fel personnummer och/eller Lösenord. . .");
         }
     }
 
-    public static void logout(){
+    public static void logout() {
         System.out.println("Du loggas ut. . .");
         bankID = -1;
     }
 
-    public static void depositCash(){
+    public static void depositCash() {
 
         String format = "%-15s %15s %15s\n";
-        System.out.format((format), "Account ID", "AccountNumber", "MoneyInAccount");
+        System.out.format((format), "ACCOUNT ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
             if (accountsList.get(i).personalID.equals(customersList.get(bankID).getPersonalID())) {
                 System.out.format((format), i, accountsList.get(i).accountNumber, accountsList.get(i).cashInAccount);
             }
         }
-        System.out.print("Which account would you like to deposit your money to? choose with help of \"Account ID\": ");
+        System.out.print("Vilket konto vill du sätta in pengar på? ta hjälp utav \"Account ID\": ");
         String accID = keyBoard.nextLine();
-        try{
-            Integer.parseInt(accID);
-        } catch(Exception e) {
-            System.out.println("Felaktikt värde.");
+        boolean inputCheck;
+        inputCheck = checkInput(accID);
+
+        if(inputCheck ||
+                Integer.parseInt(accID) >= accountsList.size() ||
+                !accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())){
+            System.out.println("Felaktig inmatning utav Account ID.");
             return;
         }
-        System.out.print("How much money would you like to deposit? amount: ");
+        System.out.print("Hur mycket pengar vill du sätta in? summa: ");
         String amount = keyBoard.nextLine();
-        try{
+        try {
             Double.parseDouble(amount);
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Felaktikt värde.");
             return;
         }
 
-        if(accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())){
+        if (accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
             accountsList.get(Integer.parseInt(accID)).depositCash(Double.parseDouble(amount));
-            System.out.println("Successfully deposited " + amount + " to your account!");
+            System.out.println("Satte in " + amount + " till ditt konto!");
             saveAccountsToFile();
-        } else{
-            System.out.println("Choose an account ID from the list next time.");
+        } else {
+            System.out.println("Ogiltligt account ID");
         }
     }
 
     public static void withdrawalCash() {
 
         String format = "%-15s %15s %15s\n";
-        System.out.format((format), "Account ID", "AccountNumber", "MoneyInAccount");
+        System.out.format((format), "Account ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
             if (accountsList.get(i).personalID.equals(customersList.get(bankID).getPersonalID())) {
                 System.out.format((format), i, accountsList.get(i).accountNumber, accountsList.get(i).cashInAccount);
             }
         }
-        System.out.print("From which account would you like to withdrawal your money from? choose with help of \"Account ID\": ");
+
+        System.out.print("Ifrån vilket konto vill du ta ut pengar ifrån? ta hjälp utav \"Account ID\": ");
         String accID = keyBoard.nextLine();
-        try {
-            Integer.parseInt(accID);
-        } catch (Exception e) {
-            System.out.println("Felaktig inmatning på Account ID.");
+        boolean inputCheck;
+        inputCheck = checkInput(accID);
+
+        if(inputCheck ||
+        Integer.parseInt(accID) >= accountsList.size() ||
+        !accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())){
+            System.out.println("Felaktig inmatning utav Account ID.");
             return;
         }
-        System.out.print("How much money would you like to withdrawal? Amount: ");
+
+        System.out.print("Hur mycket pengar vill du ta ut? Summa: ");
         String amount = keyBoard.nextLine();
         try {
             Double.parseDouble(amount);
@@ -692,24 +693,19 @@ public class Main {
             return;
         }
 
-        if (accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
-            if (accountsList.get(Integer.parseInt(accID)).cashInAccount > Double.parseDouble(amount)) {
-                accountsList.get(Integer.parseInt(accID)).withdrawlCash(Double.parseDouble(amount));
-                System.out.println("Successfully withdrew " + amount + " from your account!");
-                saveAccountsToFile();
-            } else {
-                System.out.println("You don't have enough money in your account.");
-            }
+        if (accountsList.get(Integer.parseInt(accID)).cashInAccount >= Double.parseDouble(amount)) {
+            accountsList.get(Integer.parseInt(accID)).withdrawlCash(Double.parseDouble(amount));
+            System.out.println("Tog ut " + amount + " ifrån ditt konto!");
+            saveAccountsToFile();
         } else {
-            System.out.println("Felaktig inmatning på Account ID.");
+            System.out.println("Du har inte tillräckligt med pengar på ditt konto.");
         }
     }
 
     public static void paymentOrders() {
 
-        System.out.println("To whom would you like to do your payment to?");
         String format = "%-15s %-15s %-15s %15s %20s \n";
-        System.out.format((format), "Account ID", "Name", "Lastname", "Account number", "Amount of money");
+        System.out.format((format), "ACCOUNT ID", "NAMN", "EFTERNAMN", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < customersList.size(); i++) {
             for (int j = 0; j < accountsList.size(); j++) {
@@ -722,20 +718,18 @@ public class Main {
             }
         }
 
-        System.out.print("choose with help of \"Account ID\": ");
+        System.out.print("Till vem skall du lägga upp ett betalningsuppdrag till? ta hjälp utav \"Account ID\": ");
         String newAccID = keyBoard.nextLine();
-        try {
-            Integer.parseInt(newAccID);
-            if(!accountsList.get(Integer.parseInt(newAccID)).personalID.equals(customersList.get(bankID).getPersonalID())){
-            } else{
-                System.out.println("Du kan ej skicka betalningsuppdrag till dig själv.");
-                return;
-            }
-        } catch (Exception e) {
-            System.out.println("Felaktig inmatning på Account ID.");
+        boolean inputCheck;
+        inputCheck = checkInput(newAccID);
+        if (inputCheck ||
+                Integer.parseInt(newAccID) >= accountsList.size() ||
+                accountsList.get(Integer.parseInt(newAccID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
+            System.out.println("Ogiltligt värde på Account ID.");
             return;
         }
-        System.out.print("Enter amount of money to transfer: ");
+
+        System.out.print("Hur mycket pengar skall du betala? Summa: ");
         String amountMoney = keyBoard.nextLine();
         try {
             Double.parseDouble(amountMoney);
@@ -745,35 +739,29 @@ public class Main {
         }
 
         String format2 = "%-15s %-15s %-20s\n";
-        System.out.format((format2), "Account ID", "AccountNumber", "MoneyInAccount");
+        System.out.format((format2), "ACCOUNT ID", "KONTONUMMER", "SALDO");
         for (int x = 0; x < accountsList.size(); x++) {
             if (accountsList.get(x).personalID.equals(customersList.get(bankID).getPersonalID())) {
                 System.out.format((format2), x, accountsList.get(x).accountNumber, accountsList.get(x).cashInAccount);
             }
         }
 
-        System.out.print("From which account would you like to transfer the money? choose with help of \"Account ID\": ");
+        System.out.print("Vilket konto vill du dra pengarna ifrån? ta hjälp utav \"Account ID\": ");
         String myAccID = keyBoard.nextLine();
-        try {
-            Integer.parseInt(myAccID);
+        inputCheck = checkInput(myAccID);
 
-            if (accountsList.get(Integer.parseInt(myAccID)).personalID.equals(customersList.get(bankID).getPersonalID()) &&
-                    !accountsList.get(Integer.parseInt(newAccID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
-            } else {
-                System.out.println("Felaktig inmatning på Account ID.");
-                return;
-            }
-        } catch (Exception e) {
+        if (inputCheck ||
+                Integer.parseInt(myAccID) >= accountsList.size() ||
+                !accountsList.get(Integer.parseInt(myAccID)).personalID.equals(customersList.get(bankID).getPersonalID()) ||
+                accountsList.get(Integer.parseInt(newAccID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
             System.out.println("Felaktig inmatning på Account ID.");
             return;
         }
 
-        double myMoney = accountsList.get(Integer.parseInt(myAccID)).cashInAccount;
         LocalDate today = LocalDate.now();
         today = today.plusDays(3);
 
-        if (Double.parseDouble(amountMoney) < myMoney) {
-
+        if (Double.parseDouble(amountMoney) <= accountsList.get(Integer.parseInt(myAccID)).cashInAccount) {
             myAccID = String.valueOf(accountsList.get(Integer.parseInt(myAccID)).accountNumber);
             newAccID = String.valueOf(accountsList.get(Integer.parseInt(newAccID)).accountNumber);
 
@@ -782,23 +770,24 @@ public class Main {
             savePaymentOrdersFile();
             System.out.println("Betalningsuppdrag lyckades!");
 
-            for (int y = 0; y < accountsList.size(); y++) {
+            /*for (int y = 0; y < accountsList.size(); y++) {
                 if (String.valueOf(accountsList.get(y).accountNumber).equals(myAccID)) {
                     accountsList.get(y).withdrawlCash(Double.parseDouble(amountMoney));
                     saveAccountsToFile();
                 }
-            }
+                SKALL DENNA VARA MED?
+            }*/
 
         } else {
-            System.out.println("You don't have enough money in your account.");
+            System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
         }
     }
 
-    public static void removePaymentOrder(){
+    public static void removePaymentOrder() {
 
         //Skriver ut betalningsuppdragen.
         String format = "%-10s %-15s %-15s %-20s %-15s \n";
-        System.out.format((format), "Index", "From account", "To account", "Amount of money", "date");
+        System.out.format((format), "Index", "FRÅN KONTO", "TILL KONTO", "SUMMA", "DATUM");
 
         for (int i = 0; i < paymentsList.size(); i++) {
             Payments p = paymentsList.get(i);
@@ -809,18 +798,11 @@ public class Main {
         String index;
         boolean term;
         do {
-            term = false;
-            System.out.print("Remove payment by index: ");
+            System.out.print("Ta bort ett betalningsuppdrag, ta hjälp utav \"Index\": : ");
             index = keyBoard.nextLine();
-            try {
-                Integer.parseInt(index);
-                if (Integer.parseInt(index) > paymentsList.size()) {
-                    term = true;
-                    System.out.println("Choose a valid integer by Index");
-                }
-            } catch (Exception e) {
-                System.out.println("Choose a valid integer index.");
-                term = true;
+            term = checkInput(index);
+            if (term || Integer.parseInt(index) >= paymentsList.size()) {
+                System.out.println("Välj ett giltligt index");
             }
         } while (term);
 
@@ -832,11 +814,11 @@ public class Main {
         String toID = null;
         String fromID = null;
 
-        for(int j = 0; j < accountsList.size(); j++) {
-            if(String.valueOf(accountsList.get(j).accountNumber).equals(paymentsList.get(Integer.parseInt(index)).fromAccount)){
+        for (int j = 0; j < accountsList.size(); j++) {
+            if (String.valueOf(accountsList.get(j).accountNumber).equals(paymentsList.get(Integer.parseInt(index)).fromAccount)) {
                 fromID = accountsList.get(j).personalID;
-                for(int y = 0; y < customersList.size(); y++){
-                    if(fromID.equals(customersList.get(y).getPersonalID())){
+                for (int y = 0; y < customersList.size(); y++) {
+                    if (fromID.equals(customersList.get(y).getPersonalID())) {
                         fromName = customersList.get(y).firstName;
                         fromLastName = customersList.get(y).lastName;
                     }
@@ -844,8 +826,8 @@ public class Main {
             }
             if (String.valueOf(accountsList.get(j).accountNumber).equals(paymentsList.get(Integer.parseInt(index)).toAccount)) {
                 toID = accountsList.get(j).personalID;
-                for(int x = 0; x < customersList.size(); x++){
-                    if(toID.equals(customersList.get(x).getPersonalID())){
+                for (int x = 0; x < customersList.size(); x++) {
+                    if (toID.equals(customersList.get(x).getPersonalID())) {
                         toName = customersList.get(x).firstName;
                         toLastname = customersList.get(x).lastName;
                     }
@@ -853,75 +835,73 @@ public class Main {
             }
         }
 
-        System.out.println("Paymentorder [" + index + "] Excecuted! Removed paymentorder:" +
-                "\nPaymentorder from: " + fromName + " " + fromLastName +
-                "\nPaymentorder to: " + toName + " " + toLastname +
-                "\nMoney: " + Double.parseDouble(paymentsList.get(Integer.parseInt(index)).moneyAmount));
+        System.out.println("Betalningsuppdrag [" + index + "] avslutat! Tog bort betalningsuppdrag:" +
+                "\nIfrån: " + fromName + " " + fromLastName +
+                "\nTill: " + toName + " " + toLastname +
+                "\nSumma: " + Double.parseDouble(paymentsList.get(Integer.parseInt(index)).moneyAmount));
         paymentsList.remove(Integer.parseInt(index));
 
         System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
         String keyPress = keyBoard.nextLine();
     }
 
-    public static void showBankVault(){
+    public static void showBankVault() {
         double money = 0;
-        for(int i = 0; i < accountsList.size(); i++){
+        for (int i = 0; i < accountsList.size(); i++) {
             money = money + accountsList.get(i).getCash();
         }
-        System.out.println("Amount of money stored in the bank at the moment: " + money);
+        System.out.println("Pengar i banken för tillfället: " + money);
     }
 
-    public static void transferCash(){
+    public static void transferCash() {
 
         String format = "%-15s %15s %20s \n";
-        System.out.format((format), "Account ID", "Account number", "Amount of money");
+        System.out.format((format), "Account ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
             if (accountsList.get(i).personalID.equals(customersList.get(bankID).getPersonalID())) {
                 System.out.format((format), i, accountsList.get(i).accountNumber, accountsList.get(i).cashInAccount);
-
             }
         }
 
-        System.out.print("from which account would you like to transfer from? choose with the help of \"Account ID\": ");
+        System.out.print("Vilket konto vill du överföra pengar ifrån? ta hjälp utav \"Account ID\": ");
         String fromAccIndex = keyBoard.nextLine();
-        System.out.print("How much money would you like to transfer? ");
+        System.out.print("Hur mycket pengar vill du överföra? ");
         String amount = keyBoard.nextLine();
-        System.out.print("Which account would you like to transfer to? choose with the help of \"Account ID\": ");
+        System.out.print("Vilket konto vill du överföra till? ta hjälp utav \"Account ID\": ");
         String newAccIndex = keyBoard.nextLine();
 
         boolean term = true;
         try {
             Integer.parseInt(newAccIndex);
-            Integer.parseInt(amount);
+            Double.parseDouble(amount);
             Integer.parseInt(fromAccIndex);
-            if(Integer.parseInt(newAccIndex) > accountsList.size()
-                    || Integer.parseInt(fromAccIndex) > accountsList.size()){
+            if (Integer.parseInt(newAccIndex) >= accountsList.size()
+                    || Integer.parseInt(fromAccIndex) >= accountsList.size()
+                    || Integer.parseInt(newAccIndex) < 0
+                    || Integer.parseInt(fromAccIndex) < 0) {
                 term = false;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             term = false;
         }
 
-        if(term){
-            if(accountsList.get(Integer.parseInt(fromAccIndex)).personalID.equals(customersList.get(bankID).getPersonalID())
-                    && accountsList.get(Integer.parseInt(newAccIndex)).personalID.equals(customersList.get(bankID).getPersonalID())){
+        if (term) {
+            if (accountsList.get(Integer.parseInt(fromAccIndex)).personalID.equals(customersList.get(bankID).getPersonalID())
+                    && accountsList.get(Integer.parseInt(newAccIndex)).personalID.equals(customersList.get(bankID).getPersonalID())) {
 
-                if(accountsList.get(Integer.parseInt(fromAccIndex)).getCash() > Integer.parseInt(amount)) {
-                    accountsList.get(Integer.parseInt(fromAccIndex)).withdrawlCash(Integer.parseInt(amount));
-                    accountsList.get(Integer.parseInt(newAccIndex)).depositCash(Integer.parseInt(amount));
+                if (accountsList.get(Integer.parseInt(fromAccIndex)).getCash() >= Double.parseDouble(amount)) {
+                    accountsList.get(Integer.parseInt(fromAccIndex)).withdrawlCash(Double.parseDouble(amount));
+                    accountsList.get(Integer.parseInt(newAccIndex)).depositCash(Double.parseDouble(amount));
                     // UPPDATERA ACCOUNT FILES HÄR
+                } else {
+                    System.out.println("Du har inte tillräckligt med pengar på kontot!");
                 }
-                else{
-                    System.out.println("You don't have enough money in that account!");
-                }
+            } else {
+                System.out.println("Ogiltligt account ID.");
             }
-            else{
-                System.out.println("You need to enter a valid index.");
-            }
-        }
-        else{
-            System.out.println("You need to enter a valid index.");
+        } else {
+            System.out.println("Ogiltligt account ID.");
         }
     }
 
@@ -930,28 +910,20 @@ public class Main {
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
         String choice = keyBoard.nextLine();
-        try {
-            Integer.parseInt(choice);
-        } catch (Exception e) {
-            System.out.println("Ange 1-2 nästa gång.");
-            return;
-        }
 
         if (choice.equals("1")) {
             listCustomers();
 
             System.out.print("Ange kund som skall göra insättning med hjälp av \"POS\": ");
             String index = keyBoard.nextLine();
-            try {
-                Integer.parseInt(index);
-                if (customersList.size() < Integer.parseInt(index)) {
-                    System.out.println("Ange ett giltligt index nästa gång.");
-                    return;
-                }
-            } catch (Exception e) {
+
+            boolean inputCheck;
+            inputCheck = checkInput(index);
+            if(inputCheck || customersList.size() <= Integer.parseInt(index)){
                 System.out.println("Ange ett giltligt index nästa gång.");
                 return;
             }
+
             System.out.println("Hur mycket pengar skall sättas in?");
             String amount = keyBoard.nextLine();
             try {
@@ -960,6 +932,7 @@ public class Main {
                 System.out.println("Ange en giltlig summa nästa gång.");
                 return;
             }
+
             String accFormat = "%15s %15s %15s\n";
             System.out.format((accFormat), "INDEX", "KONTONUMMER", "SALDO");
             String ID = customersList.get(Integer.parseInt(index)).getPersonalID();
@@ -968,39 +941,36 @@ public class Main {
                     System.out.format((accFormat), x, accountsList.get(x).accountNumber, accountsList.get(x).cashInAccount);
                 }
             }
+
             System.out.print("Vilket konto skall pengarna sättas in på?");
             String acc = keyBoard.nextLine();
-            try {
-                Integer.parseInt(acc);
-                if (!customersList.get(Integer.parseInt(index)).getPersonalID()
-                        .equals(accountsList.get(Integer.parseInt(acc)).personalID)) {
-                    System.out.println("Ange ett giltligt index nästa gång.");
-                    return;
-                }
-            } catch (Exception e) {
+            inputCheck = checkInput(acc);
+
+            if (inputCheck ||
+                    customersList.size() <= Integer.parseInt(acc) ||
+                    !customersList.get(Integer.parseInt(index)).getPersonalID().equals(accountsList.get(Integer.parseInt(acc)).personalID)) {
                 System.out.println("Ange ett giltligt index nästa gång.");
                 return;
             }
             accountsList.get(Integer.parseInt(acc)).depositCash(Double.parseDouble(amount));
 
         } else if (choice.equals("2")) {
-
             System.out.print("Sök efter personnummer: ");
             String ID = keyBoard.nextLine();
             boolean term = false;
-            for(int x = 0; x < customersList.size(); x++){
-                if(customersList.get(x).getPersonalID().equals(ID)){
+            for (int x = 0; x < customersList.size(); x++) {
+                if (customersList.get(x).getPersonalID().equals(ID)) {
                     term = true;
                 }
             }
 
-            if(term) {
-                String IDindex = null;
+            if (term) {
+                int IDindex = -1;
                 String format = "%15s %15s %15s\n";
                 System.out.format((format), "INDEX", "KONTONUMMER", "SALDO");
                 for (int j = 0; j < customersList.size(); j++) {
                     if (ID.equals(customersList.get(j).getPersonalID())) {
-                        IDindex = String.valueOf(j);
+                        IDindex = j;
                         for (int y = 0; y < accountsList.size(); y++) {
                             if (accountsList.get(y).personalID.equals(ID)) {
                                 System.out.format((format), y, accountsList.get(y).accountNumber, accountsList.get(y).cashInAccount);
@@ -1020,93 +990,176 @@ public class Main {
 
                 System.out.print("Vilket konto vill du göra insättningen på? ");
                 String index = keyBoard.nextLine();
-                try {
-                    Integer.parseInt(index);
-                    if (!customersList.get(Integer.parseInt(IDindex)).getPersonalID()
-                            .equals(accountsList.get(Integer.parseInt(index)).personalID)) {
-                        System.out.println("Ange ett giltligt index nästa gång.");
-                        return;
-                    }
-                } catch (Exception e) {
+                boolean inputCheck;
+                inputCheck = checkInput(index);
+
+                if (inputCheck ||
+                        Integer.parseInt(index) >= customersList.size() ||
+                        !customersList.get(IDindex).getPersonalID().equals(accountsList.get(Integer.parseInt(index)).personalID)) {
                     System.out.println("Ange ett giltligt index nästa gång.");
                     return;
                 }
                 accountsList.get(Integer.parseInt(index)).depositCash(Double.parseDouble(amount));
-            }else{
+            } else {
                 System.out.println("Personnummer hittades ej.");
             }
-        }else{
+        } else {
             System.out.println("Välj 1-2 i menyn nästa gång.");
         }
     }
 
-    public static void accountantPaymentorders(){
+    public static void accountantPaymentorders() {
 
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
         String choice = keyBoard.nextLine();
-        try {
-            Integer.parseInt(choice);
-        } catch (Exception e) {
-            System.out.println("Ange 1-2 nästa gång.");
+
+        if (choice.equals("1")) {
+            accountantPaymentChoiceOne();
+
+        } else if (choice.equals("2")) {
+            accountantPaymentChoiceTwo();
+        } else {
+            System.out.println("Välj i menyn 1-2 nästa gång.");
+        }
+
+    }
+
+    public static void accountantPaymentChoiceOne(){
+
+        boolean inputCheck;
+        listCustomers();
+        System.out.print("Ange kund som skall göra OCR betalning med hjälp av \"POS\": ");
+        String index = keyBoard.nextLine();
+        inputCheck = checkInput(index);
+
+        if (inputCheck || customersList.size() <= Integer.parseInt(index)) {
+            System.out.println("Ange ett giltligt index nästa gång.");
             return;
         }
 
-        if (choice.equals("1")) {
-            listCustomers();
-            System.out.print("Ange kund som skall göra OCR betalning med hjälp av \"POS\": ");
-            String index = keyBoard.nextLine();
-            try {
-                Integer.parseInt(index);
-                if (customersList.size() <= Integer.parseInt(index)) {
-                    System.out.println("Ange ett giltligt index nästa gång.");
-                    return;
+        System.out.print("Hur mycket pengar skall betalas in? summa: ");
+        String amount = keyBoard.nextLine();
+        try {
+            Double.parseDouble(amount);
+        } catch (Exception e) {
+            System.out.println("Ange en giltlig summa nästa gång.");
+            return;
+        }
+
+        String accFormat = "%-8s %-15s %10s\n";
+        System.out.format((accFormat), "INDEX", "KONTONUMMER", "SALDO");
+        String ID = customersList.get(Integer.parseInt(index)).getPersonalID();
+        for (int x = 0; x < accountsList.size(); x++) {
+            if (ID.equals(accountsList.get(x).personalID)) {
+                System.out.format((accFormat), x, accountsList.get(x).accountNumber, accountsList.get(x).cashInAccount);
+            }
+        }
+        System.out.print("Vilket konto skall pengarna dras ifrån? ta hjälp ifrån \"Index\": ");
+        String acc = keyBoard.nextLine();
+
+        inputCheck = checkInput(acc);
+
+        if (inputCheck ||
+                Integer.parseInt(acc) >= accountsList.size() ||
+                !customersList.get(Integer.parseInt(index)).getPersonalID()
+                        .equals(accountsList.get(Integer.parseInt(acc)).personalID)) {
+            System.out.println("Ange ett giltligt index nästa gång.");
+            return;
+        }
+
+        if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(acc)).getCash()) {
+
+            String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
+            System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
+            for (int j = 0; j < customersList.size(); j++) {
+                for (int i = 0; i < accountsList.size(); i++) {
+                    if (!customersList.get(j).getPersonalID().equals(customersList.get(Integer.parseInt(index)).getPersonalID())
+                            && customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
+                        System.out.format((accountFormat), i, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
+                                        + " " + String.valueOf(accountsList.get(i).accountNumber).substring(4, 6) +
+                                        " " + String.valueOf(accountsList.get(i).accountNumber).substring(6),
+                                accountsList.get(i).cashInAccount, "    " + customersList.get(j).firstName,
+                                customersList.get(j).lastName);
+                    }
                 }
-            } catch (Exception e) {
+            }
+            System.out.print("Vem skall betalningen gå till? ta hjälp ifrån \"Index\": ");
+            String whomAcc = keyBoard.nextLine();
+            inputCheck = checkInput(whomAcc);
+            if (inputCheck ||
+                    Integer.parseInt(whomAcc) >= accountsList.size()
+                    || accountsList.get(Integer.parseInt(acc)).personalID.equals(accountsList.get(Integer.parseInt(whomAcc)).personalID)) {
                 System.out.println("Ange ett giltligt index nästa gång.");
                 return;
             }
+            LocalDate day = LocalDate.now();
+            day = day.plusDays(3);
+            acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
+            whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
+            Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day));
+            paymentsList.add(newPay);
 
-            System.out.println("Hur mycket pengar skall sättas in?");
+        } else {
+            System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
+        }
+    }
+
+    public static void accountantPaymentChoiceTwo(){
+
+        System.out.print("Sök efter personnummer: ");
+        String ID = keyBoard.nextLine();
+        boolean term = false;
+
+        for (int x = 0; x < customersList.size(); x++) {
+            if (customersList.get(x).getPersonalID().equals(ID)) {
+                System.out.println("Konton ägda av kund: " + customersList.get(x).firstName + " " + customersList.get(x).lastName);
+                term = true;
+            }
+        }
+
+        if (term) {
+            int IDindex = -1;
+            String format = "%-8s %15s %15s\n";
+
+            System.out.format((format), "INDEX", "KONTONUMMER", "SALDO");
+            for (int j = 0; j < customersList.size(); j++) {
+                if (ID.equals(customersList.get(j).getPersonalID())) {
+                    IDindex = j;
+                    for (int y = 0; y < accountsList.size(); y++) {
+                        if (accountsList.get(y).personalID.equals(ID)) {
+                            System.out.format((format), y, accountsList.get(y).accountNumber, accountsList.get(y).cashInAccount);
+                        }
+                    }
+                }
+            }
+            boolean inputCheck;
+            System.out.print("Ifrån vilket konto skall pengarna betalas? ta hjälp ifrån \"Index\": ");
+            String acc = keyBoard.nextLine();
+            inputCheck = checkInput(acc);
+
+            if (inputCheck || Integer.parseInt(acc) >= accountsList.size() ||
+                    !accountsList.get(Integer.parseInt(acc)).personalID.equals(customersList.get(IDindex).getPersonalID())) {
+                System.out.println("Ange ett giltigt index nästa gång.");
+                return;
+            }
+
+            System.out.print("Hur mycket pengar skall betalas? summa: ");
             String amount = keyBoard.nextLine();
             try {
                 Double.parseDouble(amount);
             } catch (Exception e) {
                 System.out.println("Ange en giltlig summa nästa gång.");
-                return;
             }
 
-            String accFormat = "%-8s %-15s %10.2f\n";
-            System.out.format((accFormat), "INDEX", "KONTONUMMER", "SALDO");
-            String ID = customersList.get(Integer.parseInt(index)).getPersonalID();
-            for (int x = 0; x < accountsList.size(); x++) {
-                if (ID.equals(accountsList.get(x).personalID)) {
-                    System.out.format((accFormat), x, accountsList.get(x).accountNumber, accountsList.get(x).cashInAccount);
-                }
-            }
-            System.out.print("Vilket konto skall pengarna dras ifrån? ta hjälp ifrån \"Index\": ");
-            String acc = keyBoard.nextLine();
-
-            try {
-                Integer.parseInt(acc);
-                if (!customersList.get(Integer.parseInt(index)).getPersonalID()
-                        .equals(accountsList.get(Integer.parseInt(acc)).personalID)) {
-                    System.out.println("Ange ett giltligt index nästa gång.");
-                    return;
-                }
-            } catch (Exception e) {
-                System.out.println("Ange ett giltligt index nästa gång.");
-                return;
-            }
-
-            if (Double.parseDouble(amount) < accountsList.get(Integer.parseInt(acc)).getCash()) {
-
-                String accountFormat = "%-15s %10.2f %-15s %-20s\n";
-                System.out.format("%-15s %10s %-15s %-20s\n", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
+            if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(acc)).getCash()) {
+                String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
+                System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
                 for (int j = 0; j < customersList.size(); j++) {
-                    for(int i = 0; i < accountsList.size(); i++) {
-                        if(!customersList.get(j).getPersonalID().equals(accountsList.get(Integer.parseInt(index)).personalID)) {
-                            System.out.format(accountFormat, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
+                    for (int i = 0; i < accountsList.size(); i++) {
+                        if (!customersList.get(j).getPersonalID().equals(customersList.get(IDindex).getPersonalID())
+                                && customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
+                            System.out.format((accountFormat), i, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
                                             + " " + String.valueOf(accountsList.get(i).accountNumber).substring(4, 6) +
                                             " " + String.valueOf(accountsList.get(i).accountNumber).substring(6),
                                     accountsList.get(i).cashInAccount, "    " + customersList.get(j).firstName,
@@ -1114,33 +1167,44 @@ public class Main {
                         }
                     }
                 }
+
                 System.out.print("Vem skall betalningen gå till? ta hjälp ifrån \"Index\": ");
                 String whomAcc = keyBoard.nextLine();
-                try{
-                    Integer.parseInt(whomAcc);
-                    if(Integer.parseInt(whomAcc) > accountsList.size()
-                    || !accountsList.get(Integer.parseInt(acc)).personalID.equals(accountsList.get(Integer.parseInt(whomAcc)).personalID)){
-                        System.out.println("Ange ett giltligt index nästa gång.");
-                        return;
-                    }
-                }catch(Exception e){
+                inputCheck = checkInput(whomAcc);
+
+                if (inputCheck || Integer.parseInt(whomAcc) >= accountsList.size()
+                        || accountsList.get(Integer.parseInt(acc)).personalID.equals(accountsList.get(Integer.parseInt(whomAcc)).personalID)) {
                     System.out.println("Ange ett giltligt index nästa gång.");
                     return;
                 }
+
+                acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
+                whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
                 LocalDate day = LocalDate.now();
                 day = day.plusDays(3);
-                //Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day));
-                //paymentsList.add(newPay);
-                System.out.println(acc + " " + whomAcc + " " + amount + " " + day);
-            }else{
+                Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day));
+                paymentsList.add(newPay);
+
+            } else {
                 System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
             }
+        } else {
+            System.out.println("Personnummer hittades ej.");
         }
-
     }
 
-    public static void accountantTransfermoney(){
+    public static boolean checkInput(String input){
+        boolean value = false;
+        try{
+            Integer.parseInt(input);
+            if(Integer.parseInt(input) < 0){
+                value = true;
+            }
+        }catch(Exception e){
+            value = true;
+        }
 
+        return value;
     }
 
     private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {
