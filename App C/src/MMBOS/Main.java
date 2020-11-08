@@ -65,7 +65,7 @@ public class Main {
             Thread.sleep(600000); // Loopa var 10:de minut
         }
     }
-    public static boolean updateAccountFundings(String fromAccount, String toAccount, double transferAmount) throws IOException {
+    public static Boolean updateAccountFundings(String fromAccount, String toAccount, double transferAmount) throws IOException {
         fetchAccounts();
         for(int i=0; i<accountsList.size(); i++) {
             if(fromAccount.equals(String.valueOf(accountsList.get(i).accountNumber))) {
@@ -86,8 +86,7 @@ public class Main {
 
         }
         FileWriter fw = new FileWriter(accountsFile);
-        for (int i = 0; i < accountsList.size(); i++) {
-            Accounts a = accountsList.get(i);
+        for (Accounts a : accountsList) {
             fw.write(a.accountNumber + ";" + a.personalID + ";" + a.cashInAccount + "\n");
         }
         fw.close();
@@ -96,8 +95,7 @@ public class Main {
 
     public static void savePendingPayments() throws IOException {
         FileWriter fw = new FileWriter(pendingPaymentsFile);
-        for(int i = 0; i < pendingPayments.size(); i++){
-            Pending pp = pendingPayments.get(i);
+        for (Pending pp : pendingPayments) {
             fw.write(pp.fromAccount + ";" + pp.toAccount + ";" + pp.transferAmount + ";"
                     + pp.transferDate + ";" + pp.transferMessage + "\n");
         }

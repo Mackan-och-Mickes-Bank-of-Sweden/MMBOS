@@ -1,5 +1,6 @@
 package MMBOS;
 
+import com.google.gson.GsonBuilder;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -35,6 +36,10 @@ public class MainController {
     public static ArrayList <TransferMessages> transferFailMassages = new ArrayList<>();
     public static int nextAccountNumb;
     public static String newAccountNumber;
+    public static ArrayList <BlockCheck> blockChecker = new ArrayList<>();
+    public static File transferLogFile = new File("logs/transfers.log");
+    public static File hashtoryFile = new File("logs/hashtory.log");
+    public static int numOfZerosInHash = 3;
 
     @FXML private Label loggedinText;
     @FXML private ListView myAccountList;
@@ -59,8 +64,50 @@ public class MainController {
     @FXML private ComboBox cbDepositFromAccount;
     @FXML private AnchorPane depositPopup;
 
+    /**
+     * fetch previous hash from log and check against transfer log
+     * add new transfers to log file, hash to log file and perform hash check
+     * @author Michael
+     * @param fromAccount
+     * @param toAccount
+     * @param transferAmount
+     * @param transferMessage
+     * @throws FileNotFoundException
+     */
+    private static void logTransfer(String fromAccount, String toAccount, double transferAmount, String transferMessage) throws FileNotFoundException {
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
+        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
+        blockChecker.clear();
+        String dataString = fromAccount+";"+toAccount+";"+transferAmount+";"+transferMessage;
+        String previousHash = "";
+        int i = 0;
+        while (checkTransfersFile.hasNextLine()) {
+            String rowsFromFile = checkTransfersFile.nextLine();
+            String rowsFromHashtory = checkHashtoryFile.nextLine();
+            String[] readerHashParts = rowsFromHashtory.split(";");
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], Long.parseLong(readerHashParts[2]), Integer.parseInt(readerHashParts[3])));
+            previousHash = readerHashParts[0];
+            i++;
+        }
+        blockChecker.add(new BlockCheck(dataString, previousHash));
+        blockChecker.get(i).mineBlock(numOfZerosInHash);
+        try {
+            Files.write(Paths.get(String.valueOf(hashtoryFile)), (blockChecker.get(i).hash+";"+blockChecker.get(i).previousHash+";"+blockChecker.get(i).settimeStamp+";"+blockChecker.get(i).setNonce+"\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(String.valueOf(transferLogFile)), (dataString+"\n").getBytes(), StandardOpenOption.APPEND);
+        }
+        catch (Exception e) {
+            System.out.println("Problem vid skrivning till log filer");
+        }
+    }
+
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
         LocalDate dateForTransfer;
+        String transferMess;
+        if (this.transferMessage.getText().isEmpty()) {
+            transferMess = "";
+        } else {
+            transferMess = this.transferMessage.getText();
+        }
         if(datepickerTransfer.getValue() != null){
             dateForTransfer = datepickerTransfer.getValue();
         } else {
@@ -84,18 +131,13 @@ public class MainController {
                     accountsList.set(i, updateAccount);
                 }
             }
+            logTransfer(String.valueOf(fromAccountNumber), String.valueOf(toAccountNumber), amountToTransfer, transferMess);
             updateAccountListComboBoxes();
             saveAccountsToFile();
             alertPopup("Överföringen mellan dina konton utfördes!", "Kontoöverföring");
         } else {
-            String message;
-            if (transferMessage.getText().isEmpty()) {
-                message = "";
-            } else {
-                message = transferMessage.getText();
-            }
             try {
-                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+transferMess+"\n").getBytes(), StandardOpenOption.APPEND);
                 alertPopup("Överföringen har lagts till och kommer att genomföras det valda datumet","Kontoöverföring");
             }
             catch (Exception e) {
@@ -105,6 +147,12 @@ public class MainController {
     }
 
     public void doTransferOtherAccount(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
+        String transferMess;
+        if (transferMessageOther.getText().isEmpty()) {
+            transferMess = "";
+        } else {
+            transferMess = transferMessageOther.getText();
+        }
         LocalDate dateForTransfer;
         if(datepickerTransferOther.getValue() != null){
             dateForTransfer = datepickerTransferOther.getValue();
@@ -129,18 +177,13 @@ public class MainController {
                     accountsList.set(i, updateAccount);
                 }
             }
+            logTransfer(String.valueOf(fromAccountNumber), String.valueOf(toAccountNumber), amountToTransfer, transferMess);
             updateAccountListComboBoxes();
             saveAccountsToFile();
             alertPopup("Överföringen/Betalningen har utförts!", "Betalning / Överföring till annans konto");
         } else {
-            String message;
-            if (transferMessageOther.getText().isEmpty()) {
-                message = "";
-            } else {
-                message = transferMessageOther.getText();
-            }
             try {
-                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+message+"\n").getBytes(), StandardOpenOption.APPEND);
+                Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+transferMess+"\n").getBytes(), StandardOpenOption.APPEND);
                 alertPopup("Överföringen/Betalningen har lagts till och kommer att genomföras det valda datumet","Betalning / Överföring till annans konto");
             }
             catch (Exception e) {
@@ -309,6 +352,7 @@ public class MainController {
                     }
                     Accounts updateAccount = new Accounts(accountsList.get(i).accountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - Long.parseLong(depositAmount.getText())));
                     accountsList.set(i, updateAccount);
+                    logTransfer(String.valueOf(accountsList.get(i).accountNumber), "00000000000", Long.parseLong(depositAmount.getText()), "UTTAG");
                 }
             }
             if (noCash == false) {
