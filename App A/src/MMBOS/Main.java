@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -39,12 +42,11 @@ public class Main {
     public static ArrayList<Payments> paymentsList = new ArrayList<>();
     public static ArrayList<Customers> customersList = new ArrayList<>();
     public static ArrayList<Accounts> accountsList = new ArrayList<>();
-    public static ArrayList<Block> blockchain = new ArrayList<>(); //BlockChain...
     public static int numOfZerosInHash = 3;
     public static ArrayList<BlockCheck> blockChecker = new ArrayList<>();
     public static final String role = "Customer";
 
-    public static void main(String[] args) throws FileNotFoundException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws FileNotFoundException, NoSuchAlgorithmException, InterruptedException {
 
         checkForFiles();
         fetchCustomers();
@@ -136,49 +138,76 @@ public class Main {
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
-//Menyval 15 : Används vid felaktik inmatning
+//Menyval 15 : Används vid felaktig inmatning
             if (headMenuChoice.equals("15")) {
                 System.out.println("Felaktig inmatning.");
             }
         }
     }
 
-    private static void checkTransferHash() throws FileNotFoundException {
-        Scanner checkTransfersFile = new Scanner(transferLogFile);
-        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
-
-        while (checkTransfersFile.hasNextLine()) {
-            String rowsFromFile = checkTransfersFile.nextLine();
-            String rowsFromHashtory = checkHashtoryFile.nextLine();
-            String[] readerHashParts = rowsFromHashtory.split(";");
-            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2], readerHashParts[3]));
-        }
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
-        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
-    }
-
-    private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
+    /**
+     * check hash
+     * @author Michael
+     * @throws FileNotFoundException
+     */
+    private static void checkTransferHash() throws FileNotFoundException, InterruptedException {
+        blockChecker.clear();
         Scanner checkTransfersFile = new Scanner(transferLogFile);
         String previousHash;
         int i = 0;
         while (checkTransfersFile.hasNextLine()) {
             try {
-                previousHash = blockchain.get(blockchain.size() - 1).hash;
+                previousHash = blockChecker.get(blockChecker.size() - 1).hash;
 
             } catch (Exception e) {
                 previousHash = "0";
             }
             String rowsFromFile = checkTransfersFile.nextLine();
-            blockchain.add(new Block(rowsFromFile, previousHash));
+            blockChecker.add(new BlockCheck(rowsFromFile, previousHash));
             System.out.println("Hash av block " + i + " . . .");
-            blockchain.get(i).mineBlock(numOfZerosInHash);
+            Thread.sleep(300);
+            blockChecker.get(i).mineBlock(numOfZerosInHash);
             i++;
         }
-        System.out.println("\nBlockchain är giltig: " + isChainValid());
-
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        System.out.println("\nThe block chain: ");
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
         System.out.println(blockchainJson);
+        System.out.println("\nBlockchain är giltig: " + isChainValid());
+    }
+
+    /**
+     * fetch previous hash from log and check against transfer log
+     * add new transfers to log file, hash to log file and perform hash check
+     * @author Michael
+     * @param fromAccount
+     * @param toAccount
+     * @param transferAmount
+     * @param transferMessage
+     * @throws FileNotFoundException
+     */
+    private static void logTransfer(String fromAccount, String toAccount, double transferAmount, String transferMessage) throws FileNotFoundException {
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
+        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
+        blockChecker.clear();
+        String dataString = fromAccount+";"+toAccount+";"+transferAmount+";"+transferMessage;
+        String previousHash = "";
+        int i = 0;
+        while (checkTransfersFile.hasNextLine()) {
+            String rowsFromFile = checkTransfersFile.nextLine();
+            String rowsFromHashtory = checkHashtoryFile.nextLine();
+            String[] readerHashParts = rowsFromHashtory.split(";");
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], Long.parseLong(readerHashParts[2]), Integer.parseInt(readerHashParts[3])));
+            previousHash = readerHashParts[0];
+            i++;
+        }
+        blockChecker.add(new BlockCheck(dataString, previousHash));
+        blockChecker.get(i).mineBlock(numOfZerosInHash);
+        try {
+            Files.write(Paths.get(String.valueOf(hashtoryFile)), (blockChecker.get(i).hash+";"+blockChecker.get(i).previousHash+";"+blockChecker.get(i).settimeStamp+";"+blockChecker.get(i).setNonce+"\n").getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(String.valueOf(transferLogFile)), (dataString+"\n").getBytes(), StandardOpenOption.APPEND);
+        }
+        catch (Exception e) {
+            System.out.println("Problem vid skrivning till log filer");
+        }
     }
 
 
@@ -295,13 +324,18 @@ public class Main {
                 System.out.format(menuFormater, "[10]", "Överföringar");
                 System.out.format(menuFormater, "[11]", "Banktillgångar");
                 System.out.format("%34s\n", "----------------------------------");
+                System.out.format(menuFormater, "[12]", "Hashkontroll");
                 System.out.format(menuFormater, "[0]", "Avsluta programmet");
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
-                if (Integer.parseInt(headMenuChoise) > 11) {
+                if (Integer.parseInt(headMenuChoise) > 12) {
                     headMenuChoise = "15";
+                } else if (Integer.parseInt(headMenuChoise) == 11) {
+                    headMenuChoise = "9";
                 } else if (Integer.parseInt(headMenuChoise) == 9) {
                     headMenuChoise = "13";
+                } else if (Integer.parseInt(headMenuChoise) == 12) {
+                    headMenuChoise = "11";
                 }
 
             } else if (customersList.get(bankID).role.equals(Customers.roleAtBank.Administator)) {
@@ -402,6 +436,10 @@ public class Main {
         return menu;
     }
 
+    /**
+     * fetch all accounts from csv
+     * @author Michael
+     */
     private static void fetchAccounts() {
         try {
             Scanner accountsFileReader = new Scanner(accountsFile);
@@ -418,6 +456,10 @@ public class Main {
         }
     }
 
+    /**
+     * fetch all customers from csv
+     * @author Michael
+     */
     private static void fetchCustomers() {
         try {
             Scanner customerFileReader = new Scanner(customersFile);
@@ -475,25 +517,20 @@ public class Main {
     }
 
     public static Boolean isChainValid() {
-        Block currentBlock;
-        Block previousBlock;
+        BlockCheck currentBlock;
+        BlockCheck previousBlock;
         String hashTarget = new String(new char[numOfZerosInHash]).replace('\0', '0');
-
-        //loop through blockchain to check hashes:
-        for (int i = 1; i < blockchain.size(); i++) {
-            currentBlock = blockchain.get(i);
-            previousBlock = blockchain.get(i - 1);
-            //compare registered hash and calculated hash:
-            if (!currentBlock.hash.equals(currentBlock.calculateHash())) {
+        for (int i = 1; i < blockChecker.size(); i++) {
+            currentBlock = blockChecker.get(i);
+            previousBlock = blockChecker.get(i - 1);
+            if (!currentBlock.hash.equals(currentBlock.calculateHashChecker())) {
                 System.out.println("Nuvarande hash är korrupt.");
                 return false;
             }
-            //compare previous hash and registered previous hash
             if (!previousBlock.hash.equals(currentBlock.previousHash)) {
                 System.out.println("Föregåene hash är korrupt.");
                 return false;
             }
-            //check if hash is solved
             if (!currentBlock.hash.substring(0, numOfZerosInHash).equals(hashTarget)) {
                 System.out.println("Detta block har inte hämtats.");
                 return false;
@@ -622,9 +659,13 @@ public class Main {
         bankID = -1;
     }
 
-    public static void depositCash() {
+    public static void depositCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
+        String transferMessage = "INSÄTTNING";
+        String fromAccount = "00000000000";
+        String toAccount;
+        double transferAmount;
         System.out.format((format), "ACCOUNT ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
@@ -654,16 +695,23 @@ public class Main {
 
         if (accountsList.get(Integer.parseInt(accID)).personalID.equals(customersList.get(bankID).getPersonalID())) {
             accountsList.get(Integer.parseInt(accID)).depositCash(Double.parseDouble(amount));
+            toAccount = String.valueOf(accountsList.get(Integer.parseInt(accID)).accountNumber);
+            transferAmount = Double.parseDouble(amount);
             System.out.println("Satte in " + amount + " till ditt konto!");
             saveAccountsToFile();
+            logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
         } else {
             System.out.println("Ogiltligt account ID");
         }
     }
 
-    public static void withdrawalCash() {
+    public static void withdrawalCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
+        String transferMessage = "UTTAG";
+        String fromAccount;
+        String toAccount = "00000000000";
+        double transferAmount;
         System.out.format((format), "Account ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
@@ -697,6 +745,9 @@ public class Main {
             accountsList.get(Integer.parseInt(accID)).withdrawlCash(Double.parseDouble(amount));
             System.out.println("Tog ut " + amount + " ifrån ditt konto!");
             saveAccountsToFile();
+            fromAccount = String.valueOf(accountsList.get(Integer.parseInt(accID)).accountNumber);
+            transferAmount = Double.parseDouble(amount);
+            logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
         } else {
             System.out.println("Du har inte tillräckligt med pengar på ditt konto.");
         }
@@ -853,9 +904,13 @@ public class Main {
         System.out.println("Pengar i banken för tillfället: " + money);
     }
 
-    public static void transferCash() {
+    public static void transferCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %20s \n";
+        String transferMessage = "EGEN ÖVERFÖRING";
+        String fromAccount;
+        String toAccount;
+        double transferAmount;
         System.out.format((format), "Account ID", "KONTONUMMER", "SALDO");
 
         for (int i = 0; i < accountsList.size(); i++) {
@@ -894,6 +949,10 @@ public class Main {
                     accountsList.get(Integer.parseInt(fromAccIndex)).withdrawlCash(Double.parseDouble(amount));
                     accountsList.get(Integer.parseInt(newAccIndex)).depositCash(Double.parseDouble(amount));
                     // UPPDATERA ACCOUNT FILES HÄR
+                    fromAccount = String.valueOf(accountsList.get(Integer.parseInt(fromAccIndex)).accountNumber);
+                    toAccount = String.valueOf(accountsList.get(Integer.parseInt(newAccIndex)).accountNumber);
+                    transferAmount = Double.parseDouble(amount);
+                    logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
                 } else {
                     System.out.println("Du har inte tillräckligt med pengar på kontot!");
                 }
