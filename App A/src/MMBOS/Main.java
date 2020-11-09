@@ -288,7 +288,7 @@ public class Main {
         }
     }
 
-    private static void headMenuChoices() throws NoSuchAlgorithmException, FileNotFoundException {
+    private static void headMenuChoices() throws NoSuchAlgorithmException, FileNotFoundException, InterruptedException {
 
         while (true) {
             String headMenuChoice = printHeadMenu();
@@ -382,7 +382,7 @@ public class Main {
         }
     }
 
-    private static String printHeadMenu() {
+    private static String printHeadMenu() throws FileNotFoundException {
         //Code by Marcus
         String headMenuChoise;
         if (bankID < 0) {
@@ -1074,11 +1074,15 @@ public class Main {
         }
     }
 
-    public static void accountantDeposit() {
+    public static void accountantDeposit() throws FileNotFoundException {
 
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
         String choice = keyBoard.nextLine();
+        String transferMessage = "INSÄTTNING KASSÖR";
+        String fromAccount = "00000000000";
+        String toAccount;
+        double transferAmount;
 
         if (choice.equals("1")) {
             listCustomers();
@@ -1122,6 +1126,9 @@ public class Main {
                 return;
             }
             accountsList.get(Integer.parseInt(acc)).depositCash(Double.parseDouble(amount));
+            toAccount = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
+            transferAmount = Double.parseDouble(amount);
+            logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
 
         } else if (choice.equals("2")) {
             System.out.print("Sök efter personnummer: ");
@@ -1169,6 +1176,9 @@ public class Main {
                     return;
                 }
                 accountsList.get(Integer.parseInt(index)).depositCash(Double.parseDouble(amount));
+                toAccount = String.valueOf(accountsList.get(Integer.parseInt(index)).accountNumber);
+                transferAmount = Double.parseDouble(amount);
+                logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
             } else {
                 System.out.println("Personnummer hittades ej.");
             }
