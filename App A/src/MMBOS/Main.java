@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 import com.google.gson.GsonBuilder;
@@ -50,6 +51,123 @@ public class Main {
         fetchCustomers();
         fetchAccounts();
         fetchPaymentOrders();
+        headMenuChoices();
+
+    }
+
+    private static void checkTransferHash() throws FileNotFoundException {
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
+        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
+
+        while (checkTransfersFile.hasNextLine()) {
+            String rowsFromFile = checkTransfersFile.nextLine();
+            String rowsFromHashtory = checkHashtoryFile.nextLine();
+            String[] readerHashParts = rowsFromHashtory.split(";");
+            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2], readerHashParts[3]));
+        }
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
+        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
+    }
+
+    private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
+        Scanner checkTransfersFile = new Scanner(transferLogFile);
+        String previousHash;
+        int i = 0;
+        while (checkTransfersFile.hasNextLine()) {
+            try {
+                previousHash = blockchain.get(blockchain.size() - 1).hash;
+
+            } catch (Exception e) {
+                previousHash = "0";
+            }
+            String rowsFromFile = checkTransfersFile.nextLine();
+            blockchain.add(new Block(rowsFromFile, previousHash));
+            System.out.println("Hash av block " + i + " . . .");
+            blockchain.get(i).mineBlock(numOfZerosInHash);
+            i++;
+        }
+        System.out.println("\nBlockchain är giltig: " + isChainValid());
+
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+        System.out.println("\nThe block chain: ");
+        System.out.println(blockchainJson);
+    }
+
+
+    private static void listCustomers() {
+        String customerFormat = "%-5s %-20s %-25s\n";
+        System.out.println("\nListar alla bankens kunder");
+        System.out.format(customerFormat, "POS", "PERSONNUMMER", "KUND");
+        for (int i = 0; i < customersList.size(); i++) {
+            System.out.format(customerFormat, i, customersList.get(i).getPersonalID().substring(0, 8) + "-" + customersList.get(i).getPersonalID().substring(8), customersList.get(i).firstName + " " + customersList.get(i).lastName);
+        }
+
+    }
+
+    private static void createNewAccount() {
+        listCustomers();
+        System.out.print("\nAnge POS som kontot skall tilldelas: ");
+        String customerID = keyBoard.nextLine();
+        boolean term;
+        term = checkInput(customerID);
+
+        if (term) {
+            Random randomizer = new Random();
+            String randomAccount = "";
+            for (int i = 0; i < 5; i++) {
+                randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
+            }
+            newAccountNumber = nextAccountNumb + randomAccount;
+
+            Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(Integer.parseInt(customerID)).getPersonalID(), 0);
+            accountsList.add(addAccount);
+        } else {
+            System.out.println("Felaktig inmatning.");
+        }
+    }
+
+    private static boolean saveAccountsToFile() {
+        try {
+            FileWriter writeToFile = new FileWriter(accountsFile);
+            for (int i = 0; i < accountsList.size(); i++) {
+                writeToFile.write(accountsList.get(i).accountNumber + ";" + accountsList.get(i).personalID + ";" + accountsList.get(i).cashInAccount + "\n");
+            }
+            writeToFile.close();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Problem vid skapandet av konto");
+        }
+        return false;
+    }
+
+    private static void savePaymentOrdersFile() {
+
+        try {
+            FileWriter myWriter = new FileWriter(pendingPaymentsFile);
+            for (int i = 0; i < paymentsList.size(); i++) {
+                Payments p = paymentsList.get(i);
+                myWriter.write(p.fromAccount + ";" + p.toAccount + ";" + p.moneyAmount + ";"
+                        + p.day +
+                        "\n");
+            }
+            myWriter.close();
+        } catch (Exception e) {
+            System.out.println("Problem vid inskrivning av paymentorders.");
+        }
+    }
+
+    private static void updNextAccountNumberFile() {
+        nextAccountNumb++;
+        try {
+            FileWriter writeToFile = new FileWriter(nextAccountNumber);
+            writeToFile.write(String.valueOf(nextAccountNumb));
+            writeToFile.close();
+        } catch (Exception e) {
+            System.out.print("Kunde inte uppdatera filen med nästa kontonummer.");
+        }
+    }
+
+    private static void headMenuChoices() throws NoSuchAlgorithmException, FileNotFoundException {
 
         while (true) {
             String headMenuChoice = printHeadMenu();
@@ -140,123 +258,6 @@ public class Main {
             if (headMenuChoice.equals("15")) {
                 System.out.println("Felaktig inmatning.");
             }
-        }
-    }
-
-    private static void checkTransferHash() throws FileNotFoundException {
-        Scanner checkTransfersFile = new Scanner(transferLogFile);
-        Scanner checkHashtoryFile = new Scanner(hashtoryFile);
-
-        while (checkTransfersFile.hasNextLine()) {
-            String rowsFromFile = checkTransfersFile.nextLine();
-            String rowsFromHashtory = checkHashtoryFile.nextLine();
-            String[] readerHashParts = rowsFromHashtory.split(";");
-            blockChecker.add(new BlockCheck(rowsFromFile, readerHashParts[1], readerHashParts[2], readerHashParts[3]));
-        }
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockChecker);
-        if (isChainValid()) System.out.println("\nHashkontontrollen utförd, alla uppgifter stämmer!");
-    }
-
-    private static void saveTransferData() throws FileNotFoundException {  //Todo: Skapa transfer, spara i log med hash
-        Scanner checkTransfersFile = new Scanner(transferLogFile);
-        String previousHash;
-        int i = 0;
-        while (checkTransfersFile.hasNextLine()) {
-            try {
-                previousHash = blockchain.get(blockchain.size() - 1).hash;
-
-            } catch (Exception e) {
-                previousHash = "0";
-            }
-            String rowsFromFile = checkTransfersFile.nextLine();
-            blockchain.add(new Block(rowsFromFile, previousHash));
-            System.out.println("Hash av block " + i + " . . .");
-            blockchain.get(i).mineBlock(numOfZerosInHash);
-            i++;
-        }
-        System.out.println("\nBlockchain är giltig: " + isChainValid());
-
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        System.out.println("\nThe block chain: ");
-        System.out.println(blockchainJson);
-    }
-
-
-    private static void listCustomers() {
-        String customerFormat = "%-5s %-20s %-25s\n";
-        System.out.println("\nListar alla bankens kunder");
-        System.out.format(customerFormat, "POS", "PERSONNUMMER", "KUND");
-        for (int i = 0; i < customersList.size(); i++) {
-            System.out.format(customerFormat, i, customersList.get(i).getPersonalID().substring(0, 8) + "-" + customersList.get(i).getPersonalID().substring(8), customersList.get(i).firstName + " " + customersList.get(i).lastName);
-        }
-
-    }
-
-    private static void createNewAccount() {
-        listCustomers();
-        System.out.print("\nAnge POS som kontot skall tilldelas: ");
-        String customerID = keyBoard.nextLine();
-        boolean term;
-        try {
-            Integer.parseInt(customerID);
-            term = true;
-        } catch (Exception e) {
-            term = false;
-        }
-
-        if (term) {
-            Random randomizer = new Random();
-            String randomAccount = "";
-            for (int i = 0; i < 5; i++) {
-                randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
-            }
-            newAccountNumber = nextAccountNumb + randomAccount;
-
-            Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(Integer.parseInt(customerID)).getPersonalID(), 0);
-            accountsList.add(addAccount);
-        } else {
-            System.out.println("Felaktig inmatning.");
-        }
-    }
-
-    private static boolean saveAccountsToFile() {
-        try {
-            FileWriter writeToFile = new FileWriter(accountsFile);
-            for (int i = 0; i < accountsList.size(); i++) {
-                writeToFile.write(accountsList.get(i).accountNumber + ";" + accountsList.get(i).personalID + ";" + accountsList.get(i).cashInAccount + "\n");
-            }
-            writeToFile.close();
-            return true;
-        } catch (Exception e) {
-            System.out.println("Problem vid skapandet av konto");
-        }
-        return false;
-    }
-
-    private static void savePaymentOrdersFile() {
-
-        try {
-            FileWriter myWriter = new FileWriter(pendingPaymentsFile);
-            for (int i = 0; i < paymentsList.size(); i++) {
-                Payments p = paymentsList.get(i);
-                myWriter.write(p.fromAccount + ";" + p.toAccount + ";" + p.moneyAmount + ";"
-                        + p.day +
-                        "\n");
-            }
-            myWriter.close();
-        } catch (Exception e) {
-            System.out.println("Problem vid inskrivning av paymentorders.");
-        }
-    }
-
-    private static void updNextAccountNumberFile() {
-        nextAccountNumb++;
-        try {
-            FileWriter writeToFile = new FileWriter(nextAccountNumber);
-            writeToFile.write(String.valueOf(nextAccountNumb));
-            writeToFile.close();
-        } catch (Exception e) {
-            System.out.print("Kunde inte uppdatera filen med nästa kontonummer.");
         }
     }
 
@@ -444,7 +445,7 @@ public class Main {
             }
             paymentOrderReader.close();
         } catch (Exception e) {
-
+            System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -544,7 +545,7 @@ public class Main {
             try {
                 term = checkID(personID);
             } catch (Exception e) {
-                System.out.println("Something went wrong with ID creation...");
+                System.out.println("Något gick fel med personnummer...");
                 term = false;
             }
 
@@ -647,6 +648,10 @@ public class Main {
         String amount = keyBoard.nextLine();
         try {
             Double.parseDouble(amount);
+            if(Double.parseDouble(amount) < 0){
+                System.out.println("Felaktikt värde.");
+                return;
+            }
         } catch (Exception e) {
             System.out.println("Felaktikt värde.");
             return;
@@ -684,10 +689,14 @@ public class Main {
             return;
         }
 
-        System.out.print("Hur mycket pengar vill du ta ut? Summa: ");
+        System.out.print("Hur mycket pengar vill du ta ut? Summa: "); 
         String amount = keyBoard.nextLine();
         try {
             Double.parseDouble(amount);
+            if(Double.parseDouble(amount) < 0){
+                System.out.println("Felaktikt värde.");
+                return;
+            }
         } catch (Exception e) {
             System.out.println("Felaktig inmatning på pengar.");
             return;
@@ -730,9 +739,13 @@ public class Main {
         }
 
         System.out.print("Hur mycket pengar skall du betala? Summa: ");
-        String amountMoney = keyBoard.nextLine();
+        String amount = keyBoard.nextLine();
         try {
-            Double.parseDouble(amountMoney);
+            Double.parseDouble(amount);
+            if(Double.parseDouble(amount) < 0){
+                System.out.println("Felaktikt värde.");
+                return;
+            }
         } catch (Exception e) {
             System.out.println("Felaktig inmatning på pengar.");
             return;
@@ -761,11 +774,11 @@ public class Main {
         LocalDate today = LocalDate.now();
         today = today.plusDays(3);
 
-        if (Double.parseDouble(amountMoney) <= accountsList.get(Integer.parseInt(myAccID)).cashInAccount) {
+        if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(myAccID)).cashInAccount) {
             myAccID = String.valueOf(accountsList.get(Integer.parseInt(myAccID)).accountNumber);
             newAccID = String.valueOf(accountsList.get(Integer.parseInt(newAccID)).accountNumber);
 
-            Payments newpay = new Payments(myAccID, newAccID, amountMoney, String.valueOf(today));
+            Payments newpay = new Payments(myAccID, newAccID, amount, String.valueOf(today));
             paymentsList.add(newpay);
             savePaymentOrdersFile();
             System.out.println("Betalningsuppdrag lyckades!");
@@ -879,7 +892,8 @@ public class Main {
             if (Integer.parseInt(newAccIndex) >= accountsList.size()
                     || Integer.parseInt(fromAccIndex) >= accountsList.size()
                     || Integer.parseInt(newAccIndex) < 0
-                    || Integer.parseInt(fromAccIndex) < 0) {
+                    || Integer.parseInt(fromAccIndex) < 0
+                    || Double.parseDouble(amount) < 0) {
                 term = false;
             }
         } catch (Exception e) {
@@ -893,7 +907,7 @@ public class Main {
                 if (accountsList.get(Integer.parseInt(fromAccIndex)).getCash() >= Double.parseDouble(amount)) {
                     accountsList.get(Integer.parseInt(fromAccIndex)).withdrawlCash(Double.parseDouble(amount));
                     accountsList.get(Integer.parseInt(newAccIndex)).depositCash(Double.parseDouble(amount));
-                    // UPPDATERA ACCOUNT FILES HÄR
+                    saveAccountsToFile();
                 } else {
                     System.out.println("Du har inte tillräckligt med pengar på kontot!");
                 }
@@ -901,7 +915,7 @@ public class Main {
                 System.out.println("Ogiltligt account ID.");
             }
         } else {
-            System.out.println("Ogiltligt account ID.");
+            System.out.println("Ogiltligt account ID/Felaktigt värde av pengar.");
         }
     }
 
