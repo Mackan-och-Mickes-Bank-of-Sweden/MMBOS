@@ -55,98 +55,6 @@ public class Main {
         fetchPaymentOrders();
         headMenuChoices();
 
-
-        while (true) {
-            String headMenuChoice = printHeadMenu();
-// Menyval 0 : Avslutar program
-            if (headMenuChoice.equals("0")) {
-                System.out.println("Programmet avslutas. . .");
-                break;
-            }
-// Menyval 1 : Logga ut
-            if (headMenuChoice.equals("1")) {
-                logout();
-            }
-// Menyval 2 : Skapa ny kund
-            if (headMenuChoice.equals("2")) {
-                createNewCustomer();
-            }
-
-// Menyval 3 : Skapa nytt konto
-            if (headMenuChoice.equals("3")) {
-                createNewAccount();
-                if (saveAccountsToFile()) {
-                    System.out.println("Kontonummer: " + newAccountNumber + " skapades utan problem.");
-                }
-                fetchAccounts();
-                updNextAccountNumberFile();
-
-                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-                String keyPress = keyBoard.nextLine();
-            }
-
-// Menyval 4 : Lista alla kunder
-            if (headMenuChoice.equals("4")) {
-                listCustomers();
-                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-                String keyPress = keyBoard.nextLine();
-            }
-
-// Menyval 5 : Lista alla konton
-            if (headMenuChoice.equals("5")) {
-                listAccounts();
-            }
-
-// Menyval 6 : Sätt in pengar
-            if (headMenuChoice.equals("6")) {
-                depositCash();
-            }
-
-// Menyval 7 : Ta ut pengar
-            if (headMenuChoice.equals("7")) {
-                withdrawalCash();
-            }
-
-// Menyval 8 : Betalningsuppdrag
-            if (headMenuChoice.equals("8")) {
-                paymentOrders();
-            }
-
-// Menyval 9 : Visa bankvalv
-            if (headMenuChoice.equals("9")) {
-                showBankVault();
-            }
-
-// Menyval 10 : Överför pengar mellan konton
-            if (headMenuChoice.equals("10")) {
-                transferCash();
-            }
-
-            if (headMenuChoice.equals("11")) {
-                checkTransferHash();
-
-                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-                String keyPress = keyBoard.nextLine();
-            }
-// Menyval 12 : Logga in
-            if (headMenuChoice.equals("12")) {
-                login();
-            }
-// Menyval 13 : Ta bort betalningsuppdrag
-            if (headMenuChoice.equals("13")) {
-                removePaymentOrder();
-            }
-//Menyval 14 : Används utav Accountant enumen
-            if (headMenuChoice.equals("14")) {
-                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-                String keyPress = keyBoard.nextLine();
-            }
-//Menyval 15 : Används vid felaktig inmatning
-            if (headMenuChoice.equals("15")) {
-                System.out.println("Felaktig inmatning.");
-            }
-        }
-
     }
 
     /**
@@ -214,7 +122,6 @@ public class Main {
         }
     }
 
-
     private static void listCustomers() {
         String customerFormat = "%-5s %-20s %-25s\n";
         System.out.println("\nListar alla bankens kunder");
@@ -226,13 +133,14 @@ public class Main {
     }
 
     private static void createNewAccount() {
+
         listCustomers();
         System.out.print("\nAnge POS som kontot skall tilldelas: ");
         String customerID = keyBoard.nextLine();
         boolean term;
         term = checkInput(customerID);
 
-        if (term) {
+        if (!term && Integer.parseInt(customerID) < customersList.size()) {
             Random randomizer = new Random();
             String randomAccount = "";
             for (int i = 0; i < 5; i++) {
@@ -245,6 +153,7 @@ public class Main {
         } else {
             System.out.println("Felaktig inmatning.");
         }
+
     }
 
     private static boolean saveAccountsToFile() {
@@ -288,7 +197,14 @@ public class Main {
         }
     }
 
-    private static void headMenuChoices() throws NoSuchAlgorithmException, FileNotFoundException {
+    /**
+     * Headmenu choice method, directs the user from the choice of printHeadMenu.
+     * @authors Marcus & Michael
+     * @throws NoSuchAlgorithmException
+     * @throws FileNotFoundException
+     * @throws InterruptedException
+     */
+    private static void headMenuChoices() throws NoSuchAlgorithmException, FileNotFoundException, InterruptedException {
 
         while (true) {
             String headMenuChoice = printHeadMenu();
@@ -304,6 +220,8 @@ public class Main {
 // Menyval 2 : Skapa ny kund
             if (headMenuChoice.equals("2")) {
                 createNewCustomer();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 3 : Skapa nytt konto
@@ -311,9 +229,9 @@ public class Main {
                 createNewAccount();
                 if (saveAccountsToFile()) {
                     System.out.println("Kontonummer: " + newAccountNumber + " skapades utan problem.");
+                    fetchAccounts();
+                    updNextAccountNumberFile();
                 }
-                fetchAccounts();
-                updNextAccountNumberFile();
 
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
@@ -329,36 +247,47 @@ public class Main {
 // Menyval 5 : Lista alla konton
             if (headMenuChoice.equals("5")) {
                 listAccounts();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 6 : Sätt in pengar
             if (headMenuChoice.equals("6")) {
                 depositCash();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 7 : Ta ut pengar
             if (headMenuChoice.equals("7")) {
                 withdrawalCash();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 8 : Betalningsuppdrag
             if (headMenuChoice.equals("8")) {
                 paymentOrders();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 9 : Visa bankvalv
             if (headMenuChoice.equals("9")) {
                 showBankVault();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 
 // Menyval 10 : Överför pengar mellan konton
             if (headMenuChoice.equals("10")) {
                 transferCash();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
-
+// Menyval 11 :
             if (headMenuChoice.equals("11")) {
                 checkTransferHash();
-
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -369,6 +298,8 @@ public class Main {
 // Menyval 13 : Ta bort betalningsuppdrag
             if (headMenuChoice.equals("13")) {
                 removePaymentOrder();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
             }
 //Menyval 14 : Används utav Accountant enumen
             if (headMenuChoice.equals("14")) {
@@ -379,11 +310,28 @@ public class Main {
             if (headMenuChoice.equals("15")) {
                 System.out.println("Felaktig inmatning.");
             }
+//Menyval 16 : Används vid customer create account
+            if(headMenuChoice.equals("16")){
+                customerCreateAcc();
+                if(saveAccountsToFile()){
+                    System.out.println("Kontonummer: " + newAccountNumber + " skapades utan problem.");
+                    fetchAccounts();
+                    updNextAccountNumberFile();
+                }
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
+            }
         }
     }
 
+    /**
+     * printHeadMenu prints diffrent types of menues depending on your enum. Also depends on bankID to be above or equal to zero(0).
+     * Calls method headMenuCheck.
+     * @author Marcus
+     * @return variable headmenuChoice with an integer.
+     */
     private static String printHeadMenu() {
-        //Code by Marcus
+
         String headMenuChoise;
         if (bankID < 0) {
             System.out.println("       M & M Bank of Sweden       ");
@@ -478,7 +426,6 @@ public class Main {
                     headMenuChoise = "13";
                 }
 
-
             } else if (customersList.get(bankID).role.equals(Customers.roleAtBank.Customer)) {
 
                 System.out.println("       M & M Bank of Sweden       ");
@@ -496,7 +443,7 @@ public class Main {
                 if (Integer.parseInt(headMenuChoise) > 6) {
                     headMenuChoise = "15";
                 } else if (Integer.parseInt(headMenuChoise) == 2) {
-                    headMenuChoise = "3";
+                    headMenuChoise = "16";
                 } else if (Integer.parseInt(headMenuChoise) == 3) {
                     headMenuChoise = "6";
                 } else if (Integer.parseInt(headMenuChoise) == 4) {
@@ -514,8 +461,13 @@ public class Main {
         return headMenuChoise;
     }
 
+    /**
+     * Headmenu check method, calls method checkInput.
+     * Checks if the input is an integer and above or equal to zero(0), continues until it is.
+     * @author Marcus
+     * @return menu with a valid integer.
+     */
     private static String headMenuCheck() {
-        //Code by Marcus
         String menu;
         boolean term;
         do {
@@ -568,13 +520,17 @@ public class Main {
         }
     }
 
+    /**
+     * fetch all payments from csv
+     * @author Marcus
+     */
     private static void fetchPaymentOrders() {
         try {
             Scanner paymentOrderReader = new Scanner(pendingPaymentsFile);
             while (paymentOrderReader.hasNextLine()) {
                 String rowsFromFile = paymentOrderReader.nextLine();
                 String[] readerparts = rowsFromFile.split(";");
-                Payments payments = new Payments(readerparts[0], readerparts[1], readerparts[2], readerparts[3]);
+                Payments payments = new Payments(readerparts[0], readerparts[1], readerparts[2], readerparts[3], readerparts[4]);
                 paymentsList.add(payments);
             }
             paymentOrderReader.close();
@@ -632,10 +588,10 @@ public class Main {
         return true;
     }
 
-    /*
-    Code by Marcus
+    /**
+     * List customers with their accounts to their name.
+     * @author Marcus
      */
-
     public static void listAccounts() {
 
         String accountFormat = "%-15s %10.2f %-15s %-20s\n";
@@ -652,10 +608,13 @@ public class Main {
                 }
             }
         }
-        System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-        String keyPress = keyBoard.nextLine();
     }
 
+    /**
+     * Create new customer, calls methods checkID & md5Pass
+     * @author Marcus
+     * @throws NoSuchAlgorithmException
+     */
     public static void createNewCustomer() throws NoSuchAlgorithmException {
 
         System.out.print("Skriv in förnamn: ");
@@ -687,6 +646,12 @@ public class Main {
         }
     }
 
+    /**
+     * CheckID, checks if the ID of a new customer is a valid ID.
+     * @author Marcus
+     * @param personID, ID of new customer.
+     * @return true or false, depending on if it's a valid ID.
+     */
     public static boolean checkID(String personID) {
 
         String birthyear = personID.substring(2, 11);
@@ -723,6 +688,12 @@ public class Main {
         }
     }
 
+    /**
+     * Login method, calls md5Pass method.
+     * Global variable bankID controlls who is signed in to the program. Fetches the value from the array index.
+     * @author Marcus
+     * @throws NoSuchAlgorithmException
+     */
     public static void login() throws NoSuchAlgorithmException {
 
         System.out.println("Logga in till ditt konto");
@@ -747,11 +718,21 @@ public class Main {
         }
     }
 
+    /**
+     * Logout method, bankID is set to -1 since an arrayindex can't be minus.
+     * @author Marcus
+     */
     public static void logout() {
         System.out.println("Du loggas ut. . .");
         bankID = -1;
     }
 
+    /**
+     * Deposit cash method, calls methods, checkInput, saveAccountsToFile & LogTransfer
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     * @throws FileNotFoundException
+     */
     public static void depositCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
@@ -802,6 +783,12 @@ public class Main {
         }
     }
 
+    /**
+     * Withdrawal cash method, calls methods checkInput, saveAccountsToFile & LogTransfer
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     * @throws FileNotFoundException
+     */
     public static void withdrawalCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
@@ -854,6 +841,11 @@ public class Main {
         }
     }
 
+    /**
+     * Paymentorders method, calls methods checkInput & savePaymentOrderFiles.
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     */
     public static void paymentOrders() {
 
         String format = "%-15s %-15s %-15s %15s %20s \n";
@@ -885,7 +877,7 @@ public class Main {
         String amount = keyBoard.nextLine();
         try {
             Double.parseDouble(amount);
-            if(Double.parseDouble(amount) < 0){
+            if (Double.parseDouble(amount) < 0) {
                 System.out.println("Felaktikt värde.");
                 return;
             }
@@ -913,32 +905,48 @@ public class Main {
             System.out.println("Felaktig inmatning på Account ID.");
             return;
         }
+        System.out.print("Medelande: ");
+        String msg = keyBoard.nextLine();
 
-        LocalDate today = LocalDate.now();
-        today = today.plusDays(3);
+        System.out.println("Vilken dag skall betalningen göras?\n" +
+                "[1]. Snarast.\n" +
+                "[2]. Välj datum.");
+        String dateoption = keyBoard.nextLine();
 
-        if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(myAccID)).cashInAccount) {
-            myAccID = String.valueOf(accountsList.get(Integer.parseInt(myAccID)).accountNumber);
-            newAccID = String.valueOf(accountsList.get(Integer.parseInt(newAccID)).accountNumber);
+        inputCheck = checkInput(dateoption);
+        LocalDate day;
+        day = LocalDate.now();
+        day = day.plusDays(2);
 
-            Payments newpay = new Payments(myAccID, newAccID, amount, String.valueOf(today));
-            paymentsList.add(newpay);
-            savePaymentOrdersFile();
-            System.out.println("Betalningsuppdrag lyckades!");
-
-            /*for (int y = 0; y < accountsList.size(); y++) {
-                if (String.valueOf(accountsList.get(y).accountNumber).equals(myAccID)) {
-                    accountsList.get(y).withdrawlCash(Double.parseDouble(amountMoney));
-                    saveAccountsToFile();
-                }
-                SKALL DENNA VARA MED?
-            }*/
-
-        } else {
-            System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
+        if(!inputCheck && Integer.parseInt(dateoption) == 2) {
+            System.out.print("Ange giltligt datum (tex. 2007-12-03): ");
+            String date = keyBoard.nextLine();
+            try{
+                day = LocalDate.parse(date);
+            }catch(Exception e) {
+                System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+                return;
+            }
+            System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
+        }else{
+            System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
         }
+
+        myAccID = String.valueOf(accountsList.get(Integer.parseInt(myAccID)).accountNumber);
+        newAccID = String.valueOf(accountsList.get(Integer.parseInt(newAccID)).accountNumber);
+
+        Payments newpay = new Payments(myAccID, newAccID, amount, String.valueOf(day), msg);
+        paymentsList.add(newpay);
+        savePaymentOrdersFile();
+        System.out.println("Betalningsuppdrag lyckades!");
+
     }
 
+    /**
+     * Remove paymentorders method, calls methods checkInput & savePaymentOrderFiles
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     */
     public static void removePaymentOrder() {
 
         //Skriver ut betalningsuppdragen.
@@ -967,23 +975,19 @@ public class Main {
         String fromName = null;
         String toLastname = null;
         String fromLastName = null;
-        String toID = null;
-        String fromID = null;
 
         for (int j = 0; j < accountsList.size(); j++) {
             if (String.valueOf(accountsList.get(j).accountNumber).equals(paymentsList.get(Integer.parseInt(index)).fromAccount)) {
-                fromID = accountsList.get(j).personalID;
                 for (int y = 0; y < customersList.size(); y++) {
-                    if (fromID.equals(customersList.get(y).getPersonalID())) {
+                    if (accountsList.get(j).personalID.equals(customersList.get(y).getPersonalID())) {
                         fromName = customersList.get(y).firstName;
                         fromLastName = customersList.get(y).lastName;
                     }
                 }
             }
             if (String.valueOf(accountsList.get(j).accountNumber).equals(paymentsList.get(Integer.parseInt(index)).toAccount)) {
-                toID = accountsList.get(j).personalID;
                 for (int x = 0; x < customersList.size(); x++) {
-                    if (toID.equals(customersList.get(x).getPersonalID())) {
+                    if (accountsList.get(j).personalID.equals(customersList.get(x).getPersonalID())) {
                         toName = customersList.get(x).firstName;
                         toLastname = customersList.get(x).lastName;
                     }
@@ -996,11 +1000,13 @@ public class Main {
                 "\nTill: " + toName + " " + toLastname +
                 "\nSumma: " + Double.parseDouble(paymentsList.get(Integer.parseInt(index)).moneyAmount));
         paymentsList.remove(Integer.parseInt(index));
-
-        System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
-        String keyPress = keyBoard.nextLine();
+        savePaymentOrdersFile();
     }
 
+    /**
+     * Show bankvault method, adds up all the money in the bank.
+     * @author Marcus
+     */
     public static void showBankVault() {
         double money = 0;
         for (int i = 0; i < accountsList.size(); i++) {
@@ -1009,6 +1015,11 @@ public class Main {
         System.out.println("Pengar i banken för tillfället: " + money);
     }
 
+    /**
+     * Transfer cash method, calls methods saveAccountsToFile & LogTransfer
+     * @author Marcus
+     * @throws FileNotFoundException
+     */
     public static void transferCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %20s \n";
@@ -1054,10 +1065,8 @@ public class Main {
                 if (accountsList.get(Integer.parseInt(fromAccIndex)).getCash() >= Double.parseDouble(amount)) {
                     accountsList.get(Integer.parseInt(fromAccIndex)).withdrawlCash(Double.parseDouble(amount));
                     accountsList.get(Integer.parseInt(newAccIndex)).depositCash(Double.parseDouble(amount));
-
                     saveAccountsToFile();
 
-                    // UPPDATERA ACCOUNT FILES HÄR
                     fromAccount = String.valueOf(accountsList.get(Integer.parseInt(fromAccIndex)).accountNumber);
                     toAccount = String.valueOf(accountsList.get(Integer.parseInt(newAccIndex)).accountNumber);
                     transferAmount = Double.parseDouble(amount);
@@ -1074,6 +1083,11 @@ public class Main {
         }
     }
 
+    /**
+     * Accountant deposit method, used by enum Accountant. Calls methods checkInput, saveAccountsToFile & depositCash from Accounts Class.
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     */
     public static void accountantDeposit() {
 
         System.out.println("[1]. Sök efter kund i lista." +
@@ -1093,10 +1107,14 @@ public class Main {
                 return;
             }
 
-            System.out.println("Hur mycket pengar skall sättas in?");
+            System.out.print("Hur mycket pengar skall sättas in?");
             String amount = keyBoard.nextLine();
             try {
                 Double.parseDouble(amount);
+                if(Double.parseDouble(amount) < 0){
+                    System.out.println("Felaktikt värde.");
+                    return;
+                }
             } catch (Exception e) {
                 System.out.println("Ange en giltlig summa nästa gång.");
                 return;
@@ -1122,6 +1140,7 @@ public class Main {
                 return;
             }
             accountsList.get(Integer.parseInt(acc)).depositCash(Double.parseDouble(amount));
+            saveAccountsToFile();
 
         } else if (choice.equals("2")) {
             System.out.print("Sök efter personnummer: ");
@@ -1152,6 +1171,10 @@ public class Main {
                 String amount = keyBoard.nextLine();
                 try {
                     Double.parseDouble(amount);
+                    if(Double.parseDouble(amount) < 0){
+                        System.out.println("Felaktikt värde.");
+                        return;
+                    }
                 } catch (Exception e) {
                     System.out.println("Ange en giltlig summa nästa gång.");
                     return;
@@ -1169,6 +1192,7 @@ public class Main {
                     return;
                 }
                 accountsList.get(Integer.parseInt(index)).depositCash(Double.parseDouble(amount));
+                saveAccountsToFile();
             } else {
                 System.out.println("Personnummer hittades ej.");
             }
@@ -1177,6 +1201,10 @@ public class Main {
         }
     }
 
+    /**
+     * Accountant paymentorder method, calls methods AccountantPaymentChoiceOne & Two.
+     * @author Marcus
+     */
     public static void accountantPaymentorders() {
 
         System.out.println("[1]. Sök efter kund i lista." +
@@ -1194,6 +1222,11 @@ public class Main {
 
     }
 
+    /**
+     * Method used to help customers pay their paymentorders by a list. calls methods checkInput & savePaymentOrderFiles.
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     */
     public static void accountantPaymentChoiceOne(){
 
         boolean inputCheck;
@@ -1211,6 +1244,10 @@ public class Main {
         String amount = keyBoard.nextLine();
         try {
             Double.parseDouble(amount);
+            if(Double.parseDouble(amount) < 0){
+                System.out.println("Felaktikt värde.");
+                return;
+            }
         } catch (Exception e) {
             System.out.println("Ange en giltlig summa nästa gång.");
             return;
@@ -1237,8 +1274,6 @@ public class Main {
             return;
         }
 
-        if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(acc)).getCash()) {
-
             String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
             System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
             for (int j = 0; j < customersList.size(); j++) {
@@ -1262,19 +1297,47 @@ public class Main {
                 System.out.println("Ange ett giltligt index nästa gång.");
                 return;
             }
-            LocalDate day = LocalDate.now();
-            day = day.plusDays(3);
+
+            System.out.print("Medelande: ");
+            String msg = keyBoard.nextLine();
+
+            System.out.println("Vilken dag skall betalningen göras?\n" +
+                    "[1]. Snarast.\n" +
+                    "[2]. Välj datum.");
+            String dateoption = keyBoard.nextLine();
+
+            inputCheck = checkInput(dateoption);
+            LocalDate day;
+            day = LocalDate.now();
+            day = day.plusDays(2);
+
+            if(!inputCheck && Integer.parseInt(dateoption) == 2) {
+                System.out.print("Ange giltligt datum (tex. 2007-12-03): ");
+                String date = keyBoard.nextLine();
+                try{
+                    day = LocalDate.parse(date);
+                }catch(Exception e) {
+                    System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+                    return;
+                }
+                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
+            }else{
+                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
+            }
+
             acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
             whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
-            Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day));
+            Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day), msg);
             paymentsList.add(newPay);
-
-        } else {
-            System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
-        }
+            savePaymentOrdersFile();
     }
 
-    public static void accountantPaymentChoiceTwo(){
+    /**
+     * Method used to help cusomers pay paymentorders by personal ID. calls methods checkInput and savePaymentOrderFiles.
+     * Variable inputCheck, is key variable to check if input is valid.
+     * @author Marcus
+     */
+    public static void accountantPaymentChoiceTwo() {
 
         System.out.print("Sök efter personnummer: ");
         String ID = keyBoard.nextLine();
@@ -1302,6 +1365,7 @@ public class Main {
                     }
                 }
             }
+
             boolean inputCheck;
             System.out.print("Ifrån vilket konto skall pengarna betalas? ta hjälp ifrån \"Index\": ");
             String acc = keyBoard.nextLine();
@@ -1317,51 +1381,97 @@ public class Main {
             String amount = keyBoard.nextLine();
             try {
                 Double.parseDouble(amount);
+                if(Double.parseDouble(amount) < 0){
+                    System.out.println("Felaktikt värde.");
+                    return;
+                }
             } catch (Exception e) {
                 System.out.println("Ange en giltlig summa nästa gång.");
             }
 
-            if (Double.parseDouble(amount) <= accountsList.get(Integer.parseInt(acc)).getCash()) {
-                String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
-                System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
-                for (int j = 0; j < customersList.size(); j++) {
-                    for (int i = 0; i < accountsList.size(); i++) {
-                        if (!customersList.get(j).getPersonalID().equals(customersList.get(IDindex).getPersonalID())
-                                && customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
-                            System.out.format((accountFormat), i, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
-                                            + " " + String.valueOf(accountsList.get(i).accountNumber).substring(4, 6) +
-                                            " " + String.valueOf(accountsList.get(i).accountNumber).substring(6),
-                                    accountsList.get(i).cashInAccount, "    " + customersList.get(j).firstName,
-                                    customersList.get(j).lastName);
-                        }
+
+            String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
+            System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
+            for (int j = 0; j < customersList.size(); j++) {
+                for (int i = 0; i < accountsList.size(); i++) {
+                    if (!customersList.get(j).getPersonalID().equals(customersList.get(IDindex).getPersonalID())
+                            && customersList.get(j).getPersonalID().equals(accountsList.get(i).personalID)) {
+                        System.out.format((accountFormat), i, String.valueOf(accountsList.get(i).accountNumber).substring(0, 4)
+                                        + " " + String.valueOf(accountsList.get(i).accountNumber).substring(4, 6) +
+                                        " " + String.valueOf(accountsList.get(i).accountNumber).substring(6),
+                                accountsList.get(i).cashInAccount, "    " + customersList.get(j).firstName,
+                                customersList.get(j).lastName);
                     }
                 }
+            }
 
-                System.out.print("Vem skall betalningen gå till? ta hjälp ifrån \"Index\": ");
-                String whomAcc = keyBoard.nextLine();
-                inputCheck = checkInput(whomAcc);
+            System.out.print("Vem skall betalningen gå till? ta hjälp ifrån \"Index\": ");
+            String whomAcc = keyBoard.nextLine();
+            inputCheck = checkInput(whomAcc);
 
-                if (inputCheck || Integer.parseInt(whomAcc) >= accountsList.size()
-                        || accountsList.get(Integer.parseInt(acc)).personalID.equals(accountsList.get(Integer.parseInt(whomAcc)).personalID)) {
-                    System.out.println("Ange ett giltligt index nästa gång.");
+            if (inputCheck || Integer.parseInt(whomAcc) >= accountsList.size()
+                    || accountsList.get(Integer.parseInt(acc)).personalID.equals(accountsList.get(Integer.parseInt(whomAcc)).personalID)) {
+                System.out.println("Ange ett giltligt index nästa gång.");
+                return;
+            }
+
+            System.out.print("Medelande: ");
+            String msg = keyBoard.nextLine();
+
+            System.out.println("Vilken dag skall betalningen göras?\n" +
+                    "[1]. Snarast.\n" +
+                    "[2]. Välj datum.");
+            String dateoption = keyBoard.nextLine();
+
+            inputCheck = checkInput(dateoption);
+            LocalDate day;
+            day = LocalDate.now();
+            day = day.plusDays(2);
+
+            if (!inputCheck && Integer.parseInt(dateoption) == 2) {
+                System.out.print("Ange giltligt datum (tex. 2007-12-03): ");
+                String date = keyBoard.nextLine();
+                try {
+                    day = LocalDate.parse(date);
+                } catch (Exception e) {
+                    System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                     return;
                 }
-
-                acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
-                whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
-                LocalDate day = LocalDate.now();
-                day = day.plusDays(3);
-                Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day));
-                paymentsList.add(newPay);
-
+                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
             } else {
-                System.out.println("Det finns inte tillräckligt med pengar på ditt konto.");
+                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
             }
+
+            acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
+            whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
+            Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day), msg);
+            paymentsList.add(newPay);
+            savePaymentOrdersFile();
         } else {
             System.out.println("Personnummer hittades ej.");
         }
     }
 
+    public static void customerCreateAcc() {
+
+        Random randomizer = new Random();
+        String randomAccount = "";
+        for (int i = 0; i < 5; i++) {
+            randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
+        }
+        newAccountNumber = nextAccountNumb + randomAccount;
+
+        Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(bankID).getPersonalID(), 0);
+        accountsList.add(addAccount);
+
+    }
+
+    /**
+     * Check input method. Checks if the input is an integer and above or equal to zero(0).
+     * @author Marcus
+     * @param input is the String input that needs to be checked if it can be converted to an integer.
+     * @return
+     */
     public static boolean checkInput(String input){
         boolean value = false;
         try{
@@ -1387,5 +1497,3 @@ public class Main {
         return sb;
     }
 }
-
-

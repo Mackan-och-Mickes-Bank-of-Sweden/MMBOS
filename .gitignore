@@ -133,3 +133,7 @@ App C/out/production/App C/MMBOS/Pending.class
 App B/out/production/App B/MMBOS/TransferMessages.class
 App B/out/production/App B/MMBOS/StringUtil.class
 App B/out/production/App B/MMBOS/BlockCheck.class
+files/accounts.acc
+files/nextaccountnumber.acc
+files/pendingpayments.pay
+files/accounts.acc
