@@ -330,7 +330,7 @@ public class Main {
      * @author Marcus
      * @return variable headmenuChoice with an integer.
      */
-    private static String printHeadMenu() {
+    private static String printHeadMenu() throws FileNotFoundException{
 
         String headMenuChoise;
         if (bankID < 0) {
@@ -1088,11 +1088,15 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void accountantDeposit() {
+    public static void accountantDeposit() throws FileNotFoundException {
 
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
         String choice = keyBoard.nextLine();
+        String transferMessage = "INSÄTTNING KASSÖR";
+        String fromAccount = "00000000000";
+        String toAccount;
+        double transferAmount;
 
         if (choice.equals("1")) {
             listCustomers();
@@ -1140,7 +1144,11 @@ public class Main {
                 return;
             }
             accountsList.get(Integer.parseInt(acc)).depositCash(Double.parseDouble(amount));
+
             saveAccountsToFile();
+            toAccount = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
+            transferAmount = Double.parseDouble(amount);
+            logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
 
         } else if (choice.equals("2")) {
             System.out.print("Sök efter personnummer: ");
@@ -1193,6 +1201,11 @@ public class Main {
                 }
                 accountsList.get(Integer.parseInt(index)).depositCash(Double.parseDouble(amount));
                 saveAccountsToFile();
+
+                toAccount = String.valueOf(accountsList.get(Integer.parseInt(index)).accountNumber);
+                transferAmount = Double.parseDouble(amount);
+                logTransfer(fromAccount, toAccount, transferAmount, transferMessage);
+
             } else {
                 System.out.println("Personnummer hittades ej.");
             }
