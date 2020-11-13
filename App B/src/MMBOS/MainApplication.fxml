@@ -42,6 +42,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#menuDoTranferOtherClicked" text="Betala räkning" />
                               <MenuItem mnemonicParsing="false" onAction="#menuDoTransferClicked" text="Överföring" />
                               <MenuItem mnemonicParsing="false" onAction="#menuDepositClicked" text="Uttag" />
+                              <MenuItem mnemonicParsing="false" onAction="#menuPending" text="Kommande betalningar" />
                               <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="menuLoggaut" mnemonicParsing="false" onAction="#menuLogoutClicked" text="Logga ut" />
                            </items>
@@ -53,44 +54,50 @@
                         </Menu>
                      </menus>
                   </MenuBar>
-                  <ListView fx:id="myAccountList" maxWidth="328.0" minWidth="328.0" prefHeight="216.0" prefWidth="328.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="3" />
+                  <ListView fx:id="myAccountList" maxWidth="270.0" minWidth="270.0" prefHeight="237.0" prefWidth="270.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.rowSpan="3" />
                   <ImageView fitHeight="59.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <image>
                         <Image url="@m_m_b_o_s.png" />
                      </image>
                   </ImageView>
-                  <ComboBox fx:id="comboMenu" onAction="#comboMenu" prefHeight="27.0" prefWidth="300.0" promptText="Välj åtgärd" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                  <Pane fx:id="groupTransferOwnAccount" prefHeight="183.0" prefWidth="273.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                  <ComboBox fx:id="comboMenu" onAction="#comboMenu" prefHeight="27.0" prefWidth="300.0" promptText="Välj åtgärd" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                  <Pane fx:id="groupTransferOwnAccount" prefHeight="183.0" prefWidth="273.0" visible="false" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
                         <TextField fx:id="transferMessage" layoutY="75.0" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande" GridPane.columnIndex="3" GridPane.rowIndex="4" />
                         <DatePicker fx:id="datepickerTransfer" layoutY="130.0" prefHeight="27.0" prefWidth="201.0" promptText="Datum för överföring" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                        <ComboBox fx:id="cbTransferFromAccount" prefHeight="27.0" prefWidth="289.0" promptText="Från konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                        <ComboBox fx:id="cbTransferFromAccount" prefHeight="27.0" prefWidth="310.0" promptText="Från konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="TOP" />
                         <TextField fx:id="transferAmount" layoutX="178.0" layoutY="75.0" prefHeight="27.0" prefWidth="112.0" promptText="Belopp" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                         <Button fx:id="doTransferButton" layoutX="244.0" layoutY="130.0" mnemonicParsing="false" onAction="#doTransferButtonClicked" text="Utför" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                        <ComboBox fx:id="cbTransferToAccount" layoutY="35.0" prefHeight="27.0" prefWidth="289.0" promptText="Till konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
+                        <ComboBox fx:id="cbTransferToAccount" layoutY="35.0" prefHeight="27.0" prefWidth="310.0" promptText="Till konto" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
                      </children>
                   </Pane>
-                  <Pane fx:id="groupDeposit" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                  <Pane fx:id="groupDeposit" prefHeight="200.0" prefWidth="200.0" visible="false" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
                         <Button fx:id="depositButton" layoutX="218.0" layoutY="41.0" mnemonicParsing="false" onAction="#depositButtonClicked" text="Ta ut" />
                         <TextField fx:id="depositAmount" layoutY="41.0" prefHeight="27.0" prefWidth="185.0" promptText="Belopp" />
-                        <ComboBox fx:id="cbDepositFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="264.0" promptText="Välj konto" />
+                        <ComboBox fx:id="cbDepositFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="310.0" promptText="Välj konto" />
                      </children>
                   </Pane>
-                  <Pane fx:id="groupCreateNewAccount" prefHeight="46.0" prefWidth="288.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                  <Pane fx:id="groupCreateNewAccount" prefHeight="46.0" prefWidth="288.0" visible="false" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
                         <Button fx:id="createNewAccountButton" layoutY="21.0" mnemonicParsing="false" onAction="#createNewAccountButtonClicked" text="Skapa ett nytt konto" />
                         <CheckBox fx:id="checkboxCreateNewAccount" layoutY="67.0" mnemonicParsing="false" text="Jag har läst villkoren för konto" />
                      </children>
                   </Pane>
-                  <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" visible="false" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                  <Pane fx:id="groupTransferOtherAccount" prefHeight="200.0" prefWidth="200.0" visible="false" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
                      <children>
                         <Button fx:id="doTransferOtherButton" layoutX="237.0" layoutY="119.0" mnemonicParsing="false" onAction="#doTransferOtherButtonClicked" text="Utför" />
                         <TextField fx:id="transferAmountOther" layoutX="178.0" layoutY="81.0" prefHeight="27.0" prefWidth="104.0" promptText="Belopp" />
-                        <ComboBox fx:id="cbTransferOtherFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="283.0" promptText="Från konto" />
+                        <ComboBox fx:id="cbTransferOtherFromAccount" layoutY="1.0" prefHeight="27.0" prefWidth="310.0" promptText="Från konto" />
                         <DatePicker fx:id="datepickerTransferOther" layoutY="119.0" prefHeight="27.0" prefWidth="217.0" promptText="Datum för överföring" />
                         <TextField fx:id="transferMessageOther" layoutY="81.0" prefHeight="27.0" prefWidth="165.0" promptText="Meddelande / OCR" />
                         <TextField fx:id="toAccountOther" layoutY="38.0" prefHeight="27.0" prefWidth="283.0" promptText="Till konto / PG / BG" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="groupDeleteTransfer" layoutX="454.0" layoutY="139.0" prefHeight="46.0" prefWidth="288.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" GridPane.rowSpan="3">
+                     <children>
+                        <Button fx:id="deleteTransferButton" layoutY="151.0" mnemonicParsing="false" onAction="#deleteTransferButtonClicked" text="Ta bort överföring/betalning" />
+                        <ListView fx:id="pendingTransfersList" prefHeight="139.0" prefWidth="405.0" />
                      </children>
                   </Pane>
                </children>

@@ -139,3 +139,7 @@ files/pendingpayments.pay
 files/accounts.acc
 files/accounts.acc
 *.acc
+App B/out/production/App B/MMBOS/MainApplication (kopia).fxml
+App B/out/production/App B/MMBOS/MMBOS.iml
+App B/out/production/App B/MMBOS/Pending.class
+App B/src/MMBOS/MMBOS.iml
