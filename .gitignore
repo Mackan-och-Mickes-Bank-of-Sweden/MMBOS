@@ -137,3 +137,5 @@ files/accounts.acc
 files/nextaccountnumber.acc
 files/pendingpayments.pay
 files/accounts.acc
+files/accounts.acc
+*.acc

@@ -4,7 +4,7 @@
     Klass: SYSJG4
     Elever: Marcus Richardson, Michael Hejl
 
-    Programmering av Michael
+    Programmering av Michael & Marcus
 
  */
 
@@ -122,6 +122,10 @@ public class Main {
         }
     }
 
+    /**
+     * lists customers.
+     * @author Michael
+     */
     private static void listCustomers() {
         String customerFormat = "%-5s %-20s %-25s\n";
         System.out.println("\nListar alla bankens kunder");
@@ -129,10 +133,13 @@ public class Main {
         for (int i = 0; i < customersList.size(); i++) {
             System.out.format(customerFormat, i, customersList.get(i).getPersonalID().substring(0, 8) + "-" + customersList.get(i).getPersonalID().substring(8), customersList.get(i).firstName + " " + customersList.get(i).lastName);
         }
-
     }
 
-    private static void createNewAccount() {
+    /**
+     * creates new account.
+     * @author Michael
+     */
+    private static boolean createNewAccount() {
 
         listCustomers();
         System.out.print("\nAnge POS som kontot skall tilldelas: ");
@@ -150,12 +157,18 @@ public class Main {
 
             Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(Integer.parseInt(customerID)).getPersonalID(), 0);
             accountsList.add(addAccount);
+            return true;
         } else {
             System.out.println("Felaktig inmatning.");
         }
-
+        return false;
     }
 
+    /**
+     * Writes accounts to file.
+     * @author Michael
+     * @return
+     */
     private static boolean saveAccountsToFile() {
         try {
             FileWriter writeToFile = new FileWriter(accountsFile);
@@ -170,6 +183,10 @@ public class Main {
         return false;
     }
 
+    /**
+     * Writes Payorders to file.
+     * @author Marcus
+     */
     private static void savePaymentOrdersFile() {
 
         try {
@@ -186,6 +203,10 @@ public class Main {
         }
     }
 
+    /**
+     * Writes next account number to file.
+     * @author Michael
+     */
     private static void updNextAccountNumberFile() {
         nextAccountNumb++;
         try {
@@ -199,7 +220,7 @@ public class Main {
 
     /**
      * Headmenu choice method, directs the user from the choice of printHeadMenu.
-     * @authors Marcus & Michael
+     * @author Marcus & Michael
      * @throws NoSuchAlgorithmException
      * @throws FileNotFoundException
      * @throws InterruptedException
@@ -213,10 +234,12 @@ public class Main {
                 System.out.println("Programmet avslutas. . .");
                 break;
             }
+
 // Menyval 1 : Logga ut
             if (headMenuChoice.equals("1")) {
                 logout();
             }
+
 // Menyval 2 : Skapa ny kund
             if (headMenuChoice.equals("2")) {
                 createNewCustomer();
@@ -226,13 +249,11 @@ public class Main {
 
 // Menyval 3 : Skapa nytt konto
             if (headMenuChoice.equals("3")) {
-                createNewAccount();
-                if (saveAccountsToFile()) {
+                if (createNewAccount() && saveAccountsToFile()) {
                     System.out.println("Kontonummer: " + newAccountNumber + " skapades utan problem.");
                     fetchAccounts();
                     updNextAccountNumberFile();
                 }
-
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
@@ -301,17 +322,25 @@ public class Main {
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
-//Menyval 14 : Används utav Accountant enumen
+//Menyval 14 : Accountnat enum insättning.
             if (headMenuChoice.equals("14")) {
+                accountantDeposit();
+                System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
+                String keyPress = keyBoard.nextLine();
+
+            }
+//Menyval 15 : Accountant enum betalningsuppdrag.
+            if (headMenuChoice.equals("15")) {
+                accountantPaymentorders();
                 System.out.println("Tryck <enter> för att återgå till huvudmenyn.");
                 String keyPress = keyBoard.nextLine();
             }
-//Menyval 15 : Används vid felaktik inmatning
-            if (headMenuChoice.equals("15")) {
+//Menyval 16 : Används vid felaktik inmatning
+            if (headMenuChoice.equals("16")) {
                 System.out.println("Felaktig inmatning.");
             }
-//Menyval 16 : Används vid customer create account
-            if(headMenuChoice.equals("16")){
+//Menyval 17 : Används vid customer create account
+            if(headMenuChoice.equals("17")){
                 customerCreateAcc();
                 if(saveAccountsToFile()){
                     System.out.println("Kontonummer: " + newAccountNumber + " skapades utan problem.");
@@ -342,7 +371,7 @@ public class Main {
             System.out.print("\nMenyval: ");
             headMenuChoise = headMenuCheck();
             if (Integer.parseInt(headMenuChoise) > 1) {
-                headMenuChoise = "15";
+                headMenuChoise = "16";
             }
             if (Integer.parseInt(headMenuChoise) == 1) {
                 headMenuChoise = "12";
@@ -370,7 +399,7 @@ public class Main {
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
                 if (Integer.parseInt(headMenuChoise) > 12) {
-                    headMenuChoise = "15";
+                    headMenuChoise = "16";
                 } else if (Integer.parseInt(headMenuChoise) == 11) {
                     headMenuChoise = "9";
                 } else if (Integer.parseInt(headMenuChoise) == 9) {
@@ -391,7 +420,7 @@ public class Main {
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
                 if (Integer.parseInt(headMenuChoise) > 3) {
-                    headMenuChoise = "15";
+                    headMenuChoise = "16";
                 } else if (Integer.parseInt(headMenuChoise) == 2) {
                     headMenuChoise = "4";
                 } else if (Integer.parseInt(headMenuChoise) == 3) {
@@ -415,13 +444,13 @@ public class Main {
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
                 if (Integer.parseInt(headMenuChoise) > 8) {
-                    headMenuChoise = "15";
+                    headMenuChoise = "16";
                 } else if (Integer.parseInt(headMenuChoise) == 6) {
                     accountantDeposit();
                     headMenuChoise = "14";
                 } else if (Integer.parseInt(headMenuChoise) == 7) {
                     accountantPaymentorders();
-                    headMenuChoise = "14";
+                    headMenuChoise = "15";
                 } else if (Integer.parseInt(headMenuChoise) == 8) {
                     headMenuChoise = "13";
                 }
@@ -441,9 +470,9 @@ public class Main {
                 System.out.print("\nMenyval: ");
                 headMenuChoise = headMenuCheck();
                 if (Integer.parseInt(headMenuChoise) > 6) {
-                    headMenuChoise = "15";
-                } else if (Integer.parseInt(headMenuChoise) == 2) {
                     headMenuChoise = "16";
+                } else if (Integer.parseInt(headMenuChoise) == 2) {
+                    headMenuChoise = "17";
                 } else if (Integer.parseInt(headMenuChoise) == 3) {
                     headMenuChoise = "6";
                 } else if (Integer.parseInt(headMenuChoise) == 4) {
@@ -455,7 +484,7 @@ public class Main {
                 }
 
             } else {
-                headMenuChoise = "15";
+                headMenuChoise = "16";
             }
         }
         return headMenuChoise;
@@ -539,6 +568,10 @@ public class Main {
         }
     }
 
+    /**
+     * Check if files exist.
+     * @author Michael
+     */
     private static void checkForFiles() {
         try {
             if (!customersFile.exists()) {
@@ -565,6 +598,11 @@ public class Main {
         }
     }
 
+    /**
+     * Checks if blockhain is valid.
+     * @author Michael
+     * @return
+     */
     public static Boolean isChainValid() {
         BlockCheck currentBlock;
         BlockCheck previousBlock;
@@ -592,7 +630,7 @@ public class Main {
      * List customers with their accounts to their name.
      * @author Marcus
      */
-    public static void listAccounts() {
+    private static void listAccounts() {
 
         String accountFormat = "%-15s %10.2f %-15s %-20s\n";
         System.out.println("\nListar alla konton på banken");
@@ -611,20 +649,32 @@ public class Main {
     }
 
     /**
-     * Create new customer, calls methods checkID & md5Pass
+     * Create new customer, calls methods checkID, checkMessage & md5Pass
      * @author Marcus
      * @throws NoSuchAlgorithmException
      */
-    public static void createNewCustomer() throws NoSuchAlgorithmException {
-
+    private static void createNewCustomer() throws NoSuchAlgorithmException {
+        boolean checkInput;
         System.out.print("Skriv in förnamn: ");
         String firstname = keyBoard.nextLine();
+        checkInput = checkMessage(firstname);
+        if(checkInput){
+            return;
+        }
         System.out.print("Skriv in efternamn: ");
         String lastname = keyBoard.nextLine();
+        checkInput = checkMessage(lastname);
+        if(checkInput){
+            return;
+        }
         System.out.print("Skriv in personnummer(12 siffror): ");
         String personID = keyBoard.nextLine();
         System.out.print("Skriv in nytt lösenord: ");
         String password1 = keyBoard.nextLine();
+        checkInput = checkMessage(password1);
+        if(checkInput){
+            return;
+        }
         System.out.print("Skriv in nytt lösenord igen: ");
         String password2 = keyBoard.nextLine();
 
@@ -652,7 +702,7 @@ public class Main {
      * @param personID, ID of new customer.
      * @return true or false, depending on if it's a valid ID.
      */
-    public static boolean checkID(String personID) {
+    private static boolean checkID(String personID) {
 
         String birthyear = personID.substring(2, 11);
         char[] controllnr = personID.toCharArray();
@@ -733,7 +783,7 @@ public class Main {
      * @author Marcus
      * @throws FileNotFoundException
      */
-    public static void depositCash() throws FileNotFoundException {
+    private static void depositCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
         String transferMessage = "INSÄTTNING";
@@ -789,7 +839,7 @@ public class Main {
      * @author Marcus
      * @throws FileNotFoundException
      */
-    public static void withdrawalCash() throws FileNotFoundException {
+    private static void withdrawalCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %15s\n";
         String transferMessage = "UTTAG";
@@ -846,7 +896,7 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void paymentOrders() {
+    private static void paymentOrders() {
 
         String format = "%-15s %-15s %-15s %15s %20s \n";
         System.out.format((format), "ACCOUNT ID", "NAMN", "EFTERNAMN", "KONTONUMMER", "SALDO");
@@ -907,6 +957,10 @@ public class Main {
         }
         System.out.print("Medelande: ");
         String msg = keyBoard.nextLine();
+        inputCheck = checkMessage(msg);
+        if(inputCheck){
+            return;
+        }
 
         System.out.println("Vilken dag skall betalningen göras?\n" +
                 "[1]. Snarast.\n" +
@@ -927,11 +981,9 @@ public class Main {
                 System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                 return;
             }
-            System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
-        }else{
-            System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
         }
 
+        System.out.println("Datum för överföringen har satts till: " + day);
         myAccID = String.valueOf(accountsList.get(Integer.parseInt(myAccID)).accountNumber);
         newAccID = String.valueOf(accountsList.get(Integer.parseInt(newAccID)).accountNumber);
 
@@ -939,7 +991,6 @@ public class Main {
         paymentsList.add(newpay);
         savePaymentOrdersFile();
         System.out.println("Betalningsuppdrag lyckades!");
-
     }
 
     /**
@@ -947,7 +998,7 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void removePaymentOrder() {
+    private static void removePaymentOrder() {
 
         //Skriver ut betalningsuppdragen.
         String format = "%-10s %-15s %-15s %-20s %-15s \n";
@@ -1020,7 +1071,7 @@ public class Main {
      * @author Marcus
      * @throws FileNotFoundException
      */
-    public static void transferCash() throws FileNotFoundException {
+    private static void transferCash() throws FileNotFoundException {
 
         String format = "%-15s %15s %20s \n";
         String transferMessage = "EGEN ÖVERFÖRING";
@@ -1088,7 +1139,7 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void accountantDeposit() throws FileNotFoundException {
+    private static void accountantDeposit() throws FileNotFoundException {
 
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
@@ -1157,6 +1208,7 @@ public class Main {
             for (int x = 0; x < customersList.size(); x++) {
                 if (customersList.get(x).getPersonalID().equals(ID)) {
                     term = true;
+                    break;
                 }
             }
 
@@ -1218,7 +1270,7 @@ public class Main {
      * Accountant paymentorder method, calls methods AccountantPaymentChoiceOne & Two.
      * @author Marcus
      */
-    public static void accountantPaymentorders() {
+    private static void accountantPaymentorders() {
 
         System.out.println("[1]. Sök efter kund i lista." +
                 "\n[2]. Sök efter kunds personnummer.");
@@ -1240,7 +1292,7 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void accountantPaymentChoiceOne(){
+    private static void accountantPaymentChoiceOne(){
 
         boolean inputCheck;
         listCustomers();
@@ -1313,6 +1365,10 @@ public class Main {
 
             System.out.print("Medelande: ");
             String msg = keyBoard.nextLine();
+            inputCheck = checkMessage(msg);
+            if(inputCheck){
+                return;
+            }
 
             System.out.println("Vilken dag skall betalningen göras?\n" +
                     "[1]. Snarast.\n" +
@@ -1333,13 +1389,11 @@ public class Main {
                     System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                     return;
                 }
-                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
-            }else{
-                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
             }
-
+            System.out.println("Datum för överföringen har satts till: " + day);
             acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
             whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
+
             Payments newPay = new Payments(acc, whomAcc, amount, String.valueOf(day), msg);
             paymentsList.add(newPay);
             savePaymentOrdersFile();
@@ -1350,7 +1404,7 @@ public class Main {
      * Variable inputCheck, is key variable to check if input is valid.
      * @author Marcus
      */
-    public static void accountantPaymentChoiceTwo() {
+    private static void accountantPaymentChoiceTwo() {
 
         System.out.print("Sök efter personnummer: ");
         String ID = keyBoard.nextLine();
@@ -1402,7 +1456,6 @@ public class Main {
                 System.out.println("Ange en giltlig summa nästa gång.");
             }
 
-
             String accountFormat = "%-8s %-15s %10.2f %-15s %-20s\n";
             System.out.format("%-8s %-15s %10s %-15s %-20s\n", "INDEX", "KONTO", "SALDO", "    FÖRNAMN", "EFTERNAMN");
             for (int j = 0; j < customersList.size(); j++) {
@@ -1430,6 +1483,10 @@ public class Main {
 
             System.out.print("Medelande: ");
             String msg = keyBoard.nextLine();
+            inputCheck = checkMessage(msg);
+            if(inputCheck){
+                return;
+            }
 
             System.out.println("Vilken dag skall betalningen göras?\n" +
                     "[1]. Snarast.\n" +
@@ -1450,10 +1507,9 @@ public class Main {
                     System.out.print(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                     return;
                 }
-                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
-            } else {
-                System.out.println("Datum för överföringen har satts till: " + String.valueOf(day));
             }
+            System.out.println("Datum för överföringen har satts till: " + day);
+
 
             acc = String.valueOf(accountsList.get(Integer.parseInt(acc)).accountNumber);
             whomAcc = String.valueOf(accountsList.get(Integer.parseInt(whomAcc)).accountNumber);
@@ -1465,7 +1521,11 @@ public class Main {
         }
     }
 
-    public static void customerCreateAcc() {
+    /**
+     * Creates new account for customers.
+     * @author Michael & Marcus
+     */
+    private static void customerCreateAcc() {
 
         Random randomizer = new Random();
         String randomAccount = "";
@@ -1477,6 +1537,8 @@ public class Main {
         Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), customersList.get(bankID).getPersonalID(), 0);
         accountsList.add(addAccount);
 
+        fetchAccounts();
+        updNextAccountNumberFile();
     }
 
     /**
@@ -1495,10 +1557,31 @@ public class Main {
         }catch(Exception e){
             value = true;
         }
-
         return value;
     }
 
+    /**
+     * Checks if message for pending payments contains ";"
+     * @author Marcus
+     * @param msg is the input message.
+     */
+    public static boolean checkMessage(String msg){
+        for(int i = 0; i < msg.length(); i++){
+            if(String.valueOf(msg.charAt(i)).equals(";")){
+                System.out.println("Otillåtet tecken.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Converts password to md5 code.
+     * @author Michael
+     * @param text is the users password before it gets converted.
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
     private static StringBuilder md5Pass(String text) throws NoSuchAlgorithmException {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         md5.update(text.getBytes());
