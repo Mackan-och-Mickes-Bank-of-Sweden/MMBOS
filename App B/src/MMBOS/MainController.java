@@ -1,11 +1,13 @@
 package MMBOS;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +23,11 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.function.UnaryOperator;
+
+
+    /*
+        Hela App B är programmerad av Michael
+    */
 
 public class MainController {
     public static MainController mc;
@@ -267,6 +274,13 @@ public class MainController {
     public void menuHelpAboutClicked (Event e) {
         alertPopup("Marcus Richardsson & Michael Hejls projektarbete i Objektorienterad Programmering 1, SYSJG4 2020","Om MMBOS - Mackan & Micke's Bank of Sweden");
     }
+    public void menuAccountRules (Event e) {
+        alertPopup("Ett kundkonto hos MMBOS kan komma att stängas av om:\n Kunden har gjort sig skyldig till väsentligt avtalsbrott,\n" +
+                "- om Kunden använder Betalkonto, Betaltjänst, produkt eller tjänst för brottslig verksamhet eller på annat sätt som strider mot gällande lagstiftning, förordning, myndighets föreskrifter eller beslut,\n" +
+                "- om MMBOS är förhindrad att tillhanda hålla Kunden Betalkonto, Betaltjänst, produkt eller tjänst p.g.a. gällande lagstiftning, förordning, myndighets föreskrifter eller beslut,\n" +
+                "- om Kunden inte svarar på MMBOS:s frågor eller på annat sätt inte bidrar till att MMBOS löpande uppnår tillräcklig kundkännedom, i enlighet med gällande penningtvättlagstiftning, eller\n" +
+                "- om Kunden blir listad på någon av MMBOS tillämpad sanktionslista avseende internationella sanktioner utanför EES, t.ex. OFAC.  ","Villkor för konto");
+    }
     public void menuNewAccountClicked (Event e) {
         hideAllGroups();
         groupCreateNewAccount.setVisible(true);
@@ -274,14 +288,28 @@ public class MainController {
     }
     
     /**
-     * log out from system, change scene to login
+     * log out from system, restart stage, change scene to login
      * @author Michael
      */
     public void menuLogoutClicked() {
         alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
+        main.appWin.close();
+        Platform.runLater( () -> {
+            try {
+                new Main().start( new Stage() );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         main.appWin.setScene(main.mapScenes.get("loginScene"));
         LoginController.lc.personalIDField.requestFocus();
     }
+
+    /**
+     * @author Michael
+     * @param e
+     * @throws IOException
+     */
     public void doTransferOtherButtonClicked (Event e) throws IOException {
         if (!cbTransferOtherFromAccount.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
             doTransferOtherAccount(Long.parseLong(cbTransferOtherFromAccount.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
@@ -289,6 +317,12 @@ public class MainController {
             alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra betalningen/överföringen","Betalning / Överföring till annans konto");
         }
     }
+
+    /**
+     * @author Michael
+     * @param e
+     * @throws IOException
+     */
     public void doTransferButtonClicked (Event e) throws IOException {
         if (!cbTransferFromAccount.getSelectionModel().isEmpty() && !cbTransferToAccount.getSelectionModel().isEmpty() && !transferAmount.getText().isEmpty()) {
             doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccount.getValue().toString()), Long.parseLong(cbTransferToAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
@@ -297,6 +331,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Creates an information pop up window
+     * @author Michael
+     * @param messageText Text to be shown as a message to the customer
+     * @param headerText Header of alert window
+     */
     private void alertPopup(String messageText, String headerText) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, messageText, ButtonType.OK);
         alert.setTitle("** M M B O S **");
@@ -501,7 +541,7 @@ public class MainController {
             for (int i = 0; i< allPendingPayments.size(); i++) {
                 for (int j = 0; j < accountsList.size(); j++) {
                     if (String.valueOf(accountsList.get(j).accountNumber).equals(allPendingPayments.get(i).fromAccount) && accountsList.get(j).getPersonalID().equals(loggedinID)) {
-                        pendingTransfersList.getItems().add(allPendingPayments.get(i).transferDate + "\t" + allPendingPayments.get(i).fromAccount + "\t" + allPendingPayments.get(i).toAccount + "\t" + nfSv.format(allPendingPayments.get(i).transferAmount));
+                        pendingTransfersList.getItems().add(allPendingPayments.get(i).transferDate + "\t█  " + allPendingPayments.get(i).fromAccount + "\t█  " + allPendingPayments.get(i).toAccount + "\t█  " + nfSv.format(allPendingPayments.get(i).transferAmount));
                     }
                 }
             }
@@ -565,7 +605,7 @@ public class MainController {
      * @author Michael
      * @param actionEvent
      */
-    public void comboMenu(ActionEvent actionEvent) {
+    public void comboMenu(ActionEvent actionEvent) throws Exception{
         hideAllGroups();
         if (comboMenu.getValue().equals("Överföring eget konto")){
             groupTransferOwnAccount.setVisible(true);
