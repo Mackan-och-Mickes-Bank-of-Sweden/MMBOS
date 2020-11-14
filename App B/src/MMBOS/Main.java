@@ -10,6 +10,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import java.util.HashMap;
 
+    /*
+        Hela App B är programmerad av Michael
+    */
+
 public class Main extends Application {
     HashMap <String, Scene> mapScenes = new HashMap<>();
     Stage appWin = null;

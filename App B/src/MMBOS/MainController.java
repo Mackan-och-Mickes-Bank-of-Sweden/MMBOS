@@ -1,12 +1,13 @@
 package MMBOS;
 
-import com.google.gson.GsonBuilder;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,11 +16,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.function.UnaryOperator;
+
+
+    /*
+        Hela App B är programmerad av Michael
+    */
 
 public class MainController {
     public static MainController mc;
@@ -33,6 +41,7 @@ public class MainController {
     public static String loggedinID;
     public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
     public static File paymentProblemsFile = new File("files/paymentproblems.pay");
+    public static File pendingPaymentsFile = new File("files/pendingpayments.pay");
     public static ArrayList <TransferMessages> transferFailMassages = new ArrayList<>();
     public static int nextAccountNumb;
     public static String newAccountNumber;
@@ -40,6 +49,8 @@ public class MainController {
     public static File transferLogFile = new File("logs/transfers.log");
     public static File hashtoryFile = new File("logs/hashtory.log");
     public static int numOfZerosInHash = 3;
+    public NumberFormat nfSv = NumberFormat.getCurrencyInstance(new Locale("sv", "SE"));
+    public static ArrayList <Pending> allPendingPayments = new ArrayList<>();
 
     @FXML private Label loggedinText;
     @FXML private ListView myAccountList;
@@ -63,6 +74,8 @@ public class MainController {
     @FXML private TextField depositAmount;
     @FXML private ComboBox cbDepositFromAccount;
     @FXML private AnchorPane depositPopup;
+    @FXML private Pane groupDeleteTransfer;
+    @FXML private ListView pendingTransfersList;
 
     /**
      * fetch previous hash from log and check against transfer log
@@ -103,10 +116,14 @@ public class MainController {
     public void doTransferBetweenAccounts(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
         LocalDate dateForTransfer;
         String transferMess;
-        if (this.transferMessage.getText().isEmpty()) {
+        if (transferMessage.getText().isEmpty()) {
             transferMess = "";
         } else {
-            transferMess = this.transferMessage.getText();
+            transferMess = transferMessage.getText();
+        }
+        if (checkMessage(transferMessage.getText())) {
+            alertPopup("Ditt överföringsmeddelande innehåller ogiltiga tecken eller är för långt - max 20 tecken!","Kontoöverföring");
+            return;
         }
         if(datepickerTransfer.getValue() != null){
             dateForTransfer = datepickerTransfer.getValue();
@@ -121,7 +138,7 @@ public class MainController {
                 if (accountsList.get(i).accountNumber == fromAccountNumber) {
                     if (accountsList.get(i).cashInAccount < amountToTransfer) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Kontoöverföring");
-                        break;
+                        return;
                     }
                     Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - amountToTransfer));
                     accountsList.set(i, updateAccount);
@@ -144,6 +161,8 @@ public class MainController {
                 System.out.println("Problem vid skrivning till överföringsfilen.");
             }
         }
+        transferMessage.setText("");
+        transferAmount.setText("");
     }
 
     public void doTransferOtherAccount(long fromAccountNumber, long toAccountNumber, double amountToTransfer) throws IOException {
@@ -152,6 +171,10 @@ public class MainController {
             transferMess = "";
         } else {
             transferMess = transferMessageOther.getText();
+        }
+        if (checkMessage(transferMessageOther.getText())) {
+            alertPopup("Ditt överföringsmeddelande innehåller ogiltiga tecken eller är för långt - max 20 tecken!","Betalning / Överföring till annans konto");
+            return;
         }
         LocalDate dateForTransfer;
         if(datepickerTransferOther.getValue() != null){
@@ -167,7 +190,8 @@ public class MainController {
                 if (accountsList.get(i).accountNumber == fromAccountNumber) {
                     if (accountsList.get(i).cashInAccount < amountToTransfer) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Betalning / Överföring till annans konto");
-                        break;
+                        //break;
+                        return;
                     }
                     Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - amountToTransfer));
                     accountsList.set(i, updateAccount);
@@ -190,6 +214,9 @@ public class MainController {
                 System.out.println("Problem vid skrivning till överföringsfilen.");
             }
         }
+        transferMessageOther.setText("");
+        transferAmountOther.setText("");
+        toAccountOther.setText("");
     }
 
     public void saveAccountsToFile() throws IOException {
@@ -206,8 +233,8 @@ public class MainController {
             if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tDisponibelt belopp: "
-                    + accountsList.get(i).cashInAccount + "kr";
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \t"
+                    + nfSv.format(accountsList.get(i).cashInAccount);
             myAccountList.getItems().add(item);
         }
     }
@@ -217,16 +244,21 @@ public class MainController {
         groupTransferOtherAccount.setVisible(false);
         groupCreateNewAccount.setVisible(false);
         groupDeposit.setVisible(false);
+        groupDeleteTransfer.setVisible(false);
     }
-
+    public void deleteTransferButtonClicked (Event e) throws IOException {
+        allPendingPayments.remove(pendingTransfersList.getSelectionModel().getSelectedIndex());
+        pendingTransfersList.getItems().remove(pendingTransfersList.getSelectionModel().getSelectedIndex());
+        updatePendingPaymentsFile();
+    }
     public void menuDoTranferOtherClicked (Event e) {
         hideAllGroups();
-        comboMenu.setValue("Gör en betalning till annans konto");
+        comboMenu.setValue("Registrera betalning");
         groupTransferOtherAccount.setVisible(true);
     }
     public void menuDoTransferClicked (Event e) {
         hideAllGroups();
-        comboMenu.setValue("Gör en överföring mellan egna konton");
+        comboMenu.setValue("Överföring eget konto");
         groupTransferOwnAccount.setVisible(true);
     }
     public void menuDepositClicked (Event e) {
@@ -234,8 +266,20 @@ public class MainController {
         comboMenu.setValue("Uttag från konto");
         groupDeposit.setVisible(true);
     }
+    public void menuPending (Event e) {
+        hideAllGroups();
+        comboMenu.setValue("Kommande betalningar");
+        groupDeleteTransfer.setVisible(true);
+    }
     public void menuHelpAboutClicked (Event e) {
         alertPopup("Marcus Richardsson & Michael Hejls projektarbete i Objektorienterad Programmering 1, SYSJG4 2020","Om MMBOS - Mackan & Micke's Bank of Sweden");
+    }
+    public void menuAccountRules (Event e) {
+        alertPopup("Ett kundkonto hos MMBOS kan komma att stängas av om:\n Kunden har gjort sig skyldig till väsentligt avtalsbrott,\n" +
+                "- om Kunden använder Betalkonto, Betaltjänst, produkt eller tjänst för brottslig verksamhet eller på annat sätt som strider mot gällande lagstiftning, förordning, myndighets föreskrifter eller beslut,\n" +
+                "- om MMBOS är förhindrad att tillhanda hålla Kunden Betalkonto, Betaltjänst, produkt eller tjänst p.g.a. gällande lagstiftning, förordning, myndighets föreskrifter eller beslut,\n" +
+                "- om Kunden inte svarar på MMBOS:s frågor eller på annat sätt inte bidrar till att MMBOS löpande uppnår tillräcklig kundkännedom, i enlighet med gällande penningtvättlagstiftning, eller\n" +
+                "- om Kunden blir listad på någon av MMBOS tillämpad sanktionslista avseende internationella sanktioner utanför EES, t.ex. OFAC.  ","Villkor för konto");
     }
     public void menuNewAccountClicked (Event e) {
         hideAllGroups();
@@ -244,14 +288,28 @@ public class MainController {
     }
     
     /**
-     * log out from system, change scene to login
+     * log out from system, restart stage, change scene to login
      * @author Michael
      */
     public void menuLogoutClicked() {
         alertPopup("Du loggas nu ut ur systemet!", "Välkommen åter!");
+        main.appWin.close();
+        Platform.runLater( () -> {
+            try {
+                new Main().start( new Stage() );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         main.appWin.setScene(main.mapScenes.get("loginScene"));
         LoginController.lc.personalIDField.requestFocus();
     }
+
+    /**
+     * @author Michael
+     * @param e
+     * @throws IOException
+     */
     public void doTransferOtherButtonClicked (Event e) throws IOException {
         if (!cbTransferOtherFromAccount.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
             doTransferOtherAccount(Long.parseLong(cbTransferOtherFromAccount.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
@@ -259,6 +317,12 @@ public class MainController {
             alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra betalningen/överföringen","Betalning / Överföring till annans konto");
         }
     }
+
+    /**
+     * @author Michael
+     * @param e
+     * @throws IOException
+     */
     public void doTransferButtonClicked (Event e) throws IOException {
         if (!cbTransferFromAccount.getSelectionModel().isEmpty() && !cbTransferToAccount.getSelectionModel().isEmpty() && !transferAmount.getText().isEmpty()) {
             doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccount.getValue().toString()), Long.parseLong(cbTransferToAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
@@ -267,6 +331,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Creates an information pop up window
+     * @author Michael
+     * @param messageText Text to be shown as a message to the customer
+     * @param headerText Header of alert window
+     */
     private void alertPopup(String messageText, String headerText) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, messageText, ButtonType.OK);
         alert.setTitle("** M M B O S **");
@@ -300,8 +370,8 @@ public class MainController {
             }
             String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
                     + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \tDisponibelt belopp: "
-                    + accountsList.get(i).cashInAccount + "kr";
+                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \t"
+                    + nfSv.format(accountsList.get(i).cashInAccount);
             myAccountList.getItems().add(item);
             cbTransferFromAccount.getItems().add(accountsList.get(i).accountNumber);
             cbTransferToAccount.getItems().add(accountsList.get(i).accountNumber);
@@ -310,12 +380,7 @@ public class MainController {
         }
         headerText.setText(name+"s konton i banken");
         comboMenu.getItems().clear();
-        comboMenu.getItems().addAll(
-                "Öppna nytt konto",
-                "Uttag från konto",
-                "Gör en överföring mellan egna konton",
-                "Gör en betalning till annans konto"
-        );
+        comboMenu.getItems().addAll("Öppna nytt konto", "Uttag från konto", "Överföring eget konto", "Registrera betalning", "Kommande betalningar");
 
         UnaryOperator<TextFormatter.Change> filter = change -> {
             String text = change.getText();
@@ -327,9 +392,11 @@ public class MainController {
         TextFormatter<String> textFormatter = new TextFormatter<>(filter);
         TextFormatter<String> textFormatter2 = new TextFormatter<>(filter);
         TextFormatter<String> textFormatter3 = new TextFormatter<>(filter);
+        TextFormatter<String> textFormatter4 = new TextFormatter<>(filter);
         transferAmount.setTextFormatter(textFormatter);
         transferAmountOther.setTextFormatter(textFormatter2);
         depositAmount.setTextFormatter(textFormatter3);
+        toAccountOther.setTextFormatter(textFormatter4);
     }
 
     private void clearAllLists() {
@@ -410,8 +477,8 @@ public class MainController {
         accountsList.add(addAccount);
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
-                + newAccountNumber.substring(6) + " \tDisponibelt belopp: "
-                + "0.0kr";
+                + newAccountNumber.substring(6) + " \t"
+                + nfSv.format("0");
         myAccountList.getItems().add(item);
         cbTransferFromAccount.getItems().add(newAccountNumber);
         cbTransferToAccount.getItems().add(newAccountNumber);
@@ -456,6 +523,33 @@ public class MainController {
             return;
         }
     }
+    /**
+     * fetch all pending payments for customer
+     * @author Michael
+     */
+    public void fetchMyPendingPayments() {
+        try {
+            Scanner fr = new Scanner(pendingPaymentsFile);
+            allPendingPayments.clear();
+            pendingTransfersList.getItems().clear();
+            while (fr.hasNextLine()) {
+                String rowsFromFile = fr.nextLine();
+                String[] readerParts = rowsFromFile.split(";");
+                Pending pp = new Pending(readerParts[0], readerParts[1], Double.parseDouble(readerParts[2]), readerParts[3], readerParts[4]);
+                allPendingPayments.add(pp);
+            }
+            for (int i = 0; i< allPendingPayments.size(); i++) {
+                for (int j = 0; j < accountsList.size(); j++) {
+                    if (String.valueOf(accountsList.get(j).accountNumber).equals(allPendingPayments.get(i).fromAccount) && accountsList.get(j).getPersonalID().equals(loggedinID)) {
+                        pendingTransfersList.getItems().add(allPendingPayments.get(i).transferDate + "\t█  " + allPendingPayments.get(i).fromAccount + "\t█  " + allPendingPayments.get(i).toAccount + "\t█  " + nfSv.format(allPendingPayments.get(i).transferAmount));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.print(e.getMessage() +"\n" + e.getStackTrace());
+            return;
+        }
+    }
     public static void fetchTransferFailMessages() {
         try {
             Scanner fr = new Scanner(paymentProblemsFile);
@@ -470,6 +564,23 @@ public class MainController {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
         }
     }
+
+    public static void updatePendingPaymentsFile() throws IOException {
+        try {
+            FileWriter fw = new FileWriter(pendingPaymentsFile);
+            for (int i=0; i< allPendingPayments.size(); i++) {
+                Pending pp = allPendingPayments.get(i);
+                fw.write(pp.fromAccount+";"
+                        +pp.toAccount+";"
+                        +pp.transferAmount+";"
+                        +pp.transferDate+";"
+                        +pp.transferMessage+"\n");
+            }
+            fw.close();
+        } catch (Exception e) {
+
+        }
+    }
     public static void updateTransferFailFile() throws IOException {
         try {
             FileWriter fw = new FileWriter(paymentProblemsFile);
@@ -481,7 +592,7 @@ public class MainController {
                 +tm.orgDate+";"
                 +tm.newDate+";"
                 +tm.transferMessage+";"
-                +tm.messageID+"/n");
+                +tm.messageID+"\n");
             }
             fw.close();
         } catch (Exception e) {
@@ -494,17 +605,37 @@ public class MainController {
      * @author Michael
      * @param actionEvent
      */
-    public void comboMenu(ActionEvent actionEvent) {
+    public void comboMenu(ActionEvent actionEvent) throws Exception{
         hideAllGroups();
-        if (comboMenu.getValue().equals("Gör en överföring mellan egna konton")){
+        if (comboMenu.getValue().equals("Överföring eget konto")){
             groupTransferOwnAccount.setVisible(true);
-        } else if (comboMenu.getValue().equals("Gör en betalning till annans konto")) {
+        } else if (comboMenu.getValue().equals("Registrera betalning")) {
             groupTransferOtherAccount.setVisible(true);
         } else if (comboMenu.getValue().equals("Öppna nytt konto")) {
             groupCreateNewAccount.setVisible(true);
         } else if (comboMenu.getValue().equals("Uttag från konto")) {
             groupDeposit.setVisible(true);
+        }  else if (comboMenu.getValue().equals("Kommande betalningar")) {
+            groupDeleteTransfer.setVisible(true);
+            fetchMyPendingPayments();
         }
+    }
+
+    /**
+     * Checks if message for pending payments contains ";"
+     * @author Marcus
+     * @param msg is the input message.
+     */
+
+    public static boolean checkMessage(String msg){
+        for(int i = 0; i < msg.length(); i++){
+            if(String.valueOf(msg.charAt(i)).equals(";")){
+                //System.out.println("Otillåtet tecken.");  // line edited by michael
+                return true;
+            }
+        }
+        if (msg.length() > 20) return true; // line edit by michael
+        return false;
     }
 
 }
