@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -62,6 +63,7 @@ public class Main {
                 }
             }
             savePendingPayments();
+            System.out.println("Systemet pausar, nästa överföring kl."+ LocalTime.now().plusMinutes(10));
             Thread.sleep(600000); // Loopa var 10:de minut
         }
     }

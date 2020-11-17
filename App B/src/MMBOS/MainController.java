@@ -39,7 +39,7 @@ public class MainController {
     public static File accountsFile = new File("files/accounts.acc");
     public static ArrayList <Accounts> accountsList = new ArrayList<>();
     public static String loggedinID;
-    public static File nextAccountNumber = new File("files/nextaccountnumber.acc");
+    public static File nextAccountNumberFile = new File("files/nextaccountnumber.acc");
     public static File paymentProblemsFile = new File("files/paymentproblems.pay");
     public static File pendingPaymentsFile = new File("files/pendingpayments.pay");
     public static ArrayList <TransferMessages> transferFailMassages = new ArrayList<>();
@@ -246,34 +246,41 @@ public class MainController {
         groupDeposit.setVisible(false);
         groupDeleteTransfer.setVisible(false);
     }
+
     public void deleteTransferButtonClicked (Event e) throws IOException {
         allPendingPayments.remove(pendingTransfersList.getSelectionModel().getSelectedIndex());
         pendingTransfersList.getItems().remove(pendingTransfersList.getSelectionModel().getSelectedIndex());
         updatePendingPaymentsFile();
     }
+
     public void menuDoTranferOtherClicked (Event e) {
         hideAllGroups();
         comboMenu.setValue("Registrera betalning");
         groupTransferOtherAccount.setVisible(true);
     }
+
     public void menuDoTransferClicked (Event e) {
         hideAllGroups();
         comboMenu.setValue("Överföring eget konto");
         groupTransferOwnAccount.setVisible(true);
     }
+
     public void menuDepositClicked (Event e) {
         hideAllGroups();
         comboMenu.setValue("Uttag från konto");
         groupDeposit.setVisible(true);
     }
+
     public void menuPending (Event e) {
         hideAllGroups();
         comboMenu.setValue("Kommande betalningar");
         groupDeleteTransfer.setVisible(true);
     }
+
     public void menuHelpAboutClicked (Event e) {
         alertPopup("Marcus Richardsson & Michael Hejls projektarbete i Objektorienterad Programmering 1, SYSJG4 2020","Om MMBOS - Mackan & Micke's Bank of Sweden");
     }
+
     public void menuAccountRules (Event e) {
         alertPopup("Ett kundkonto hos MMBOS kan komma att stängas av om:\n Kunden har gjort sig skyldig till väsentligt avtalsbrott,\n" +
                 "- om Kunden använder Betalkonto, Betaltjänst, produkt eller tjänst för brottslig verksamhet eller på annat sätt som strider mot gällande lagstiftning, förordning, myndighets föreskrifter eller beslut,\n" +
@@ -281,6 +288,7 @@ public class MainController {
                 "- om Kunden inte svarar på MMBOS:s frågor eller på annat sätt inte bidrar till att MMBOS löpande uppnår tillräcklig kundkännedom, i enlighet med gällande penningtvättlagstiftning, eller\n" +
                 "- om Kunden blir listad på någon av MMBOS tillämpad sanktionslista avseende internationella sanktioner utanför EES, t.ex. OFAC.  ","Villkor för konto");
     }
+
     public void menuNewAccountClicked (Event e) {
         hideAllGroups();
         groupCreateNewAccount.setVisible(true);
@@ -442,7 +450,7 @@ public class MainController {
      * @param e
      * @throws FileNotFoundException
      */
-    public void createNewAccountButtonClicked (Event e) throws FileNotFoundException {
+    public void createNewAccountButtonClicked (Event e) throws IOException {
         if (checkboxCreateNewAccount.isSelected()) {
             if (createNewAccount()) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Ditt nya konto skapades!", ButtonType.OK);
@@ -460,13 +468,13 @@ public class MainController {
      * @return
      * @throws FileNotFoundException
      */
-    public boolean createNewAccount() throws FileNotFoundException {
+    public boolean createNewAccount() throws IOException {
         Random randomizer = new Random();
         String randomAccount = "";
         for (int i = 0; i < 5; i++){
             randomAccount = randomAccount + String.valueOf(randomizer.nextInt(10));
         }
-        Scanner fileReader = new Scanner(nextAccountNumber); // Unikt kontonummer.
+        Scanner fileReader = new Scanner(nextAccountNumberFile); // Unikt kontonummer.
         if (fileReader.hasNextLine()) {
             nextAccountNumb = Integer.parseInt(fileReader.nextLine());
         } else {
@@ -478,13 +486,17 @@ public class MainController {
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
                 + newAccountNumber.substring(6) + " \t"
-                + nfSv.format("0");
+                + "0,00 kr";
         myAccountList.getItems().add(item);
         cbTransferFromAccount.getItems().add(newAccountNumber);
         cbTransferToAccount.getItems().add(newAccountNumber);
         cbTransferOtherFromAccount.getItems().add(newAccountNumber);
         cbDepositFromAccount.getItems().add(newAccountNumber);
         saveNewAccountToFile(newAccountNumber, loggedinID,0);
+
+        FileWriter fw = new FileWriter(nextAccountNumberFile);
+        fw.write((nextAccountNumb+1)+"\n");
+        fw.close();
         return true;
     }
 
