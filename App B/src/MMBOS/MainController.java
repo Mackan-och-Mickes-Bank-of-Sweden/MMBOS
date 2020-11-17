@@ -37,7 +37,8 @@ public class MainController {
     Main main;
 
     public static File accountsFile = new File("files/accounts.acc");
-    public static ArrayList <Accounts> accountsList = new ArrayList<>();
+    public static ArrayList <Accounts> allAccountsList = new ArrayList<>();
+    public static ArrayList <Accounts> customersAccountsList = new ArrayList<>();
     public static String loggedinID;
     public static File nextAccountNumberFile = new File("files/nextaccountnumber.acc");
     public static File paymentProblemsFile = new File("files/paymentproblems.pay");
@@ -134,24 +135,25 @@ public class MainController {
             alertPopup("Datum kan inte vara tidigare än dagens datum","Kontoöverföring");
         }
         else if (dateForTransfer.equals(LocalDate.now())) {
-            for (int i = 0; i < accountsList.size(); i++) {
-                if (accountsList.get(i).accountNumber == fromAccountNumber) {
-                    if (accountsList.get(i).cashInAccount < amountToTransfer) {
+            for (int i = 0; i < allAccountsList.size(); i++) {
+                if (allAccountsList.get(i).accountNumber == fromAccountNumber) {
+                    if (allAccountsList.get(i).cashInAccount < amountToTransfer) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Kontoöverföring");
                         return;
                     }
-                    Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - amountToTransfer));
-                    accountsList.set(i, updateAccount);
+                    Accounts updateAccount = new Accounts(fromAccountNumber, allAccountsList.get(i).getPersonalID(), (allAccountsList.get(i).cashInAccount - amountToTransfer));
+                    allAccountsList.set(i, updateAccount);
                 }
-                if (accountsList.get(i).accountNumber == toAccountNumber) {
-                    Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount + amountToTransfer));
-                    accountsList.set(i, updateAccount);
+                if (allAccountsList.get(i).accountNumber == toAccountNumber) {
+                    Accounts updateAccount = new Accounts(toAccountNumber, allAccountsList.get(i).getPersonalID(), (allAccountsList.get(i).cashInAccount + amountToTransfer));
+                    allAccountsList.set(i, updateAccount);
                 }
             }
             logTransfer(String.valueOf(fromAccountNumber), String.valueOf(toAccountNumber), amountToTransfer, transferMess);
             updateAccountListComboBoxes();
             saveAccountsToFile();
             alertPopup("Överföringen mellan dina konton utfördes!", "Kontoöverföring");
+            updateComboBoxes();
         } else {
             try {
                 Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+transferMess+"\n").getBytes(), StandardOpenOption.APPEND);
@@ -186,25 +188,26 @@ public class MainController {
             alertPopup("Datum kan inte vara tidigare än dagens datum","Betalning / Överföring till annans konto");
         }
         else if (dateForTransfer.equals(LocalDate.now())) {
-            for (int i = 0; i < accountsList.size(); i++) {
-                if (accountsList.get(i).accountNumber == fromAccountNumber) {
-                    if (accountsList.get(i).cashInAccount < amountToTransfer) {
+            for (int i = 0; i < allAccountsList.size(); i++) {
+                if (allAccountsList.get(i).accountNumber == fromAccountNumber) {
+                    if (allAccountsList.get(i).cashInAccount < amountToTransfer) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att utföra överföringen!", "Betalning / Överföring till annans konto");
                         //break;
                         return;
                     }
-                    Accounts updateAccount = new Accounts(fromAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - amountToTransfer));
-                    accountsList.set(i, updateAccount);
+                    Accounts updateAccount = new Accounts(fromAccountNumber, allAccountsList.get(i).getPersonalID(), (allAccountsList.get(i).cashInAccount - amountToTransfer));
+                    allAccountsList.set(i, updateAccount);
                 }
-                if (accountsList.get(i).accountNumber == toAccountNumber) {
-                    Accounts updateAccount = new Accounts(toAccountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount + amountToTransfer));
-                    accountsList.set(i, updateAccount);
+                if (allAccountsList.get(i).accountNumber == toAccountNumber) {
+                    Accounts updateAccount = new Accounts(toAccountNumber, allAccountsList.get(i).getPersonalID(), (allAccountsList.get(i).cashInAccount + amountToTransfer));
+                    allAccountsList.set(i, updateAccount);
                 }
             }
             logTransfer(String.valueOf(fromAccountNumber), String.valueOf(toAccountNumber), amountToTransfer, transferMess);
             updateAccountListComboBoxes();
             saveAccountsToFile();
             alertPopup("Överföringen/Betalningen har utförts!", "Betalning / Överföring till annans konto");
+            updateComboBoxes();
         } else {
             try {
                 Files.write(Paths.get("files/pendingpayments.pay"), (fromAccountNumber+";"+toAccountNumber+";"+amountToTransfer+";"+dateForTransfer+";"+transferMess+"\n").getBytes(), StandardOpenOption.APPEND);
@@ -221,20 +224,20 @@ public class MainController {
 
     public void saveAccountsToFile() throws IOException {
         FileWriter fw = new FileWriter(accountsFile);
-        for (int i=0; i < accountsList.size(); i++) {
-            fw.write(accountsList.get(i).accountNumber + ";" + accountsList.get(i).getPersonalID() + ";" + accountsList.get(i).cashInAccount + "\n");
+        for (int i = 0; i < allAccountsList.size(); i++) {
+            fw.write(allAccountsList.get(i).accountNumber + ";" + allAccountsList.get(i).getPersonalID() + ";" + allAccountsList.get(i).cashInAccount + "\n");
         }
         fw.close();
     }
 
     public void updateAccountListComboBoxes() {
         myAccountList.getItems().clear();
-        for (int i = 0; i< accountsList.size(); i++) {
-            if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
-            String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \t"
-                    + nfSv.format(accountsList.get(i).cashInAccount);
+        for (int i = 0; i< allAccountsList.size(); i++) {
+            if (!allAccountsList.get(i).getPersonalID().equals(loggedinID)) continue;
+            String item = String.valueOf(allAccountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(6) + " \t"
+                    + nfSv.format(allAccountsList.get(i).cashInAccount);
             myAccountList.getItems().add(item);
         }
     }
@@ -320,7 +323,8 @@ public class MainController {
      */
     public void doTransferOtherButtonClicked (Event e) throws IOException {
         if (!cbTransferOtherFromAccount.getSelectionModel().isEmpty() && !toAccountOther.getText().isEmpty() && !transferAmountOther.getText().isEmpty()) {
-            doTransferOtherAccount(Long.parseLong(cbTransferOtherFromAccount.getValue().toString()), Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
+            long fromAccount = customersAccountsList.get(cbTransferOtherFromAccount.getSelectionModel().getSelectedIndex()).accountNumber;
+            doTransferOtherAccount(fromAccount, Long.parseLong(toAccountOther.getText()), Double.parseDouble(transferAmountOther.getText()));
         } else {
             alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra betalningen/överföringen","Betalning / Överföring till annans konto");
         }
@@ -333,7 +337,9 @@ public class MainController {
      */
     public void doTransferButtonClicked (Event e) throws IOException {
         if (!cbTransferFromAccount.getSelectionModel().isEmpty() && !cbTransferToAccount.getSelectionModel().isEmpty() && !transferAmount.getText().isEmpty()) {
-            doTransferBetweenAccounts(Long.parseLong(cbTransferFromAccount.getValue().toString()), Long.parseLong(cbTransferToAccount.getValue().toString()), Double.parseDouble(transferAmount.getText()));
+            long fromAccount = customersAccountsList.get(cbTransferFromAccount.getSelectionModel().getSelectedIndex()).accountNumber;
+            long toAccount = customersAccountsList.get(cbTransferToAccount.getSelectionModel().getSelectedIndex()).accountNumber;
+            doTransferBetweenAccounts(fromAccount, toAccount, Double.parseDouble(transferAmount.getText()));
         } else {
             alertPopup("Kontrollera alla fälten, det saknas uppgifter för att kunna utföra överföringen","Kontoöverföring");
         }
@@ -352,6 +358,22 @@ public class MainController {
         alert.showAndWait();
     }
 
+    public void updateComboBoxes() {
+        clearAllLists();
+        for (int i = 0; i< allAccountsList.size(); i++) {
+            if (!allAccountsList.get(i).getPersonalID().equals(loggedinID)) continue;
+            String item = String.valueOf(allAccountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(6) + " \t"
+                    + nfSv.format(allAccountsList.get(i).cashInAccount);
+            myAccountList.getItems().add(item);
+            cbTransferFromAccount.getItems().add(item);
+            cbTransferToAccount.getItems().add(item);
+            cbTransferOtherFromAccount.getItems().add(item);
+            cbDepositFromAccount.getItems().add(item);
+        }
+    }
+
     /**
      * initialize
      * @author Michael
@@ -367,24 +389,24 @@ public class MainController {
         fetchAccounts();
         fetchTransferFailMessages();
         myAccountList.setPrefWidth(300);
-        for (int i = 0; i< accountsList.size(); i++) {
-            if (!accountsList.get(i).getPersonalID().equals(loggedinID)) continue;
+        for (int i = 0; i< allAccountsList.size(); i++) {
+            if (!allAccountsList.get(i).getPersonalID().equals(loggedinID)) continue;
             for (int j = 0; j< transferFailMassages.size(); j++) {
-                if (transferFailMassages.get(j).fromAccount.equals(String.valueOf(accountsList.get(i).accountNumber))) {
-                    alertPopup("Du har schemalagt en överföring från konto: " + accountsList.get(i).accountNumber + " som inte kunde genomföras "+ transferFailMassages.get(j).orgDate +". Nytt försök kommer att göras " + transferFailMassages.get(j).newDate, "Otillräckliga medel på kontot");
+                if (transferFailMassages.get(j).fromAccount.equals(String.valueOf(allAccountsList.get(i).accountNumber))) {
+                    alertPopup("Du har schemalagt en överföring från konto: " + allAccountsList.get(i).accountNumber + " som inte kunde genomföras "+ transferFailMassages.get(j).orgDate +". Nytt försök kommer att göras " + transferFailMassages.get(j).newDate, "Otillräckliga medel på kontot");
                     transferFailMassages.remove(j);
                     updateTransferFailFile();
                 }
             }
-            String item = String.valueOf(accountsList.get(i).accountNumber).substring(0,4) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(4,6) + " "
-                    + String.valueOf(accountsList.get(i).accountNumber).substring(6) + " \t"
-                    + nfSv.format(accountsList.get(i).cashInAccount);
+            String item = String.valueOf(allAccountsList.get(i).accountNumber).substring(0,4) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(4,6) + " "
+                    + String.valueOf(allAccountsList.get(i).accountNumber).substring(6) + " \t"
+                    + nfSv.format(allAccountsList.get(i).cashInAccount);
             myAccountList.getItems().add(item);
-            cbTransferFromAccount.getItems().add(accountsList.get(i).accountNumber);
-            cbTransferToAccount.getItems().add(accountsList.get(i).accountNumber);
-            cbTransferOtherFromAccount.getItems().add(accountsList.get(i).accountNumber);
-            cbDepositFromAccount.getItems().add(accountsList.get(i).accountNumber);
+            cbTransferFromAccount.getItems().add(item);
+            cbTransferToAccount.getItems().add(item);
+            cbTransferOtherFromAccount.getItems().add(item);
+            cbDepositFromAccount.getItems().add(item);
         }
         headerText.setText(name+"s konton i banken");
         comboMenu.getItems().clear();
@@ -418,16 +440,16 @@ public class MainController {
     public void depositButtonClicked (Event e) throws IOException {
         if (!depositAmount.getText().isEmpty() && !cbDepositFromAccount.getSelectionModel().isEmpty()) {
             Boolean noCash = false;
-            for (int i = 0; i < accountsList.size(); i++) {
-                if (accountsList.get(i).accountNumber == Long.parseLong(cbDepositFromAccount.getValue().toString())) {
-                    if (accountsList.get(i).cashInAccount < Long.parseLong(depositAmount.getText())) {
+            for (int i = 0; i < allAccountsList.size(); i++) {
+                if (allAccountsList.get(i).accountNumber == customersAccountsList.get(cbDepositFromAccount.getSelectionModel().getSelectedIndex()).accountNumber) {
+                    if (allAccountsList.get(i).cashInAccount < Long.parseLong(depositAmount.getText())) {
                         alertPopup("Det finns inte tillräckligt med likvida medel på kontot för att ta ut beloppet!", "Bankomat");
                         noCash = true;
                         break;
                     }
-                    Accounts updateAccount = new Accounts(accountsList.get(i).accountNumber, accountsList.get(i).getPersonalID(), (accountsList.get(i).cashInAccount - Long.parseLong(depositAmount.getText())));
-                    accountsList.set(i, updateAccount);
-                    logTransfer(String.valueOf(accountsList.get(i).accountNumber), "00000000000", Long.parseLong(depositAmount.getText()), "UTTAG");
+                    Accounts updateAccount = new Accounts(allAccountsList.get(i).accountNumber, allAccountsList.get(i).getPersonalID(), (allAccountsList.get(i).cashInAccount - Long.parseLong(depositAmount.getText())));
+                    allAccountsList.set(i, updateAccount);
+                    logTransfer(String.valueOf(allAccountsList.get(i).accountNumber), "00000000000", Long.parseLong(depositAmount.getText()), "UTTAG");
                 }
             }
             if (noCash == false) {
@@ -442,6 +464,7 @@ public class MainController {
 
     public void cashButtonClicked (Event e) {
         depositPopup.setVisible(false);
+        updateComboBoxes();
     }
 
     /**
@@ -482,16 +505,17 @@ public class MainController {
         }
         newAccountNumber = nextAccountNumb + randomAccount;
         Accounts addAccount = new Accounts(Long.parseLong(newAccountNumber), loggedinID, 0);
-        accountsList.add(addAccount);
+        allAccountsList.add(addAccount);
+        customersAccountsList.add(addAccount);
         String item = newAccountNumber.substring(0,4) + " "
                 + newAccountNumber.substring(4,6) + " "
                 + newAccountNumber.substring(6) + " \t"
                 + "0,00 kr";
         myAccountList.getItems().add(item);
-        cbTransferFromAccount.getItems().add(newAccountNumber);
-        cbTransferToAccount.getItems().add(newAccountNumber);
-        cbTransferOtherFromAccount.getItems().add(newAccountNumber);
-        cbDepositFromAccount.getItems().add(newAccountNumber);
+        cbTransferFromAccount.getItems().add(item);
+        cbTransferToAccount.getItems().add(item);
+        cbTransferOtherFromAccount.getItems().add(item);
+        cbDepositFromAccount.getItems().add(item);
         saveNewAccountToFile(newAccountNumber, loggedinID,0);
 
         FileWriter fw = new FileWriter(nextAccountNumberFile);
@@ -523,12 +547,16 @@ public class MainController {
     public static void fetchAccounts() {
         try {
             Scanner accountsFileReader = new Scanner(accountsFile);
-            accountsList.clear();
+            allAccountsList.clear();
+            customersAccountsList.clear();
             while (accountsFileReader.hasNextLine()) {
                 String rowsFromFile = accountsFileReader.nextLine();
                 String[] readerParts = rowsFromFile.split(";");
                 Accounts readAccount = new Accounts(Long.parseLong(readerParts[0]), readerParts[1], Double.parseDouble(readerParts[2]));
-                accountsList.add(readAccount);
+                allAccountsList.add(readAccount);
+                if (readerParts[1].equals(loggedinID)) {
+                    customersAccountsList.add(readAccount);
+                }
             }
         } catch (Exception e) {
             System.out.print(e.getMessage() +"\n" + e.getStackTrace());
@@ -551,8 +579,8 @@ public class MainController {
                 allPendingPayments.add(pp);
             }
             for (int i = 0; i< allPendingPayments.size(); i++) {
-                for (int j = 0; j < accountsList.size(); j++) {
-                    if (String.valueOf(accountsList.get(j).accountNumber).equals(allPendingPayments.get(i).fromAccount) && accountsList.get(j).getPersonalID().equals(loggedinID)) {
+                for (int j = 0; j < allAccountsList.size(); j++) {
+                    if (String.valueOf(allAccountsList.get(j).accountNumber).equals(allPendingPayments.get(i).fromAccount) && allAccountsList.get(j).getPersonalID().equals(loggedinID)) {
                         pendingTransfersList.getItems().add(allPendingPayments.get(i).transferDate + "\t█  " + allPendingPayments.get(i).fromAccount + "\t█  " + allPendingPayments.get(i).toAccount + "\t█  " + nfSv.format(allPendingPayments.get(i).transferAmount));
                     }
                 }
