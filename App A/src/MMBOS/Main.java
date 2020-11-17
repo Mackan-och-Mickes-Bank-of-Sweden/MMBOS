@@ -194,7 +194,7 @@ public class Main {
             for (int i = 0; i < paymentsList.size(); i++) {
                 Payments p = paymentsList.get(i);
                 myWriter.write(p.fromAccount + ";" + p.toAccount + ";" + p.moneyAmount + ";"
-                        + p.day +
+                        + p.day + ";" + p.message +
                         "\n");
             }
             myWriter.close();
@@ -446,10 +446,8 @@ public class Main {
                 if (Integer.parseInt(headMenuChoise) > 8) {
                     headMenuChoise = "16";
                 } else if (Integer.parseInt(headMenuChoise) == 6) {
-                    accountantDeposit();
                     headMenuChoise = "14";
                 } else if (Integer.parseInt(headMenuChoise) == 7) {
-                    accountantPaymentorders();
                     headMenuChoise = "15";
                 } else if (Integer.parseInt(headMenuChoise) == 8) {
                     headMenuChoise = "13";
@@ -990,7 +988,7 @@ public class Main {
         Payments newpay = new Payments(myAccID, newAccID, amount, String.valueOf(day), msg);
         paymentsList.add(newpay);
         savePaymentOrdersFile();
-        System.out.println("Betalningsuppdrag lyckades!");
+
     }
 
     /**
@@ -1000,6 +998,10 @@ public class Main {
      */
     private static void removePaymentOrder() {
 
+        if(paymentsList.size() == 0){
+            System.out.println("Det finns inga betalningsordrar att ta bort.");
+            return;
+        }
         //Skriver ut betalningsuppdragen.
         String format = "%-10s %-15s %-15s %-20s %-15s \n";
         System.out.format((format), "Index", "FRÅN KONTO", "TILL KONTO", "SUMMA", "DATUM");
@@ -1013,7 +1015,7 @@ public class Main {
         String index;
         boolean term;
         do {
-            System.out.print("Ta bort ett betalningsuppdrag, ta hjälp utav \"Index\": : ");
+            System.out.print("Ta bort ett betalningsuppdrag, ta hjälp utav \"Index\": ");
             index = keyBoard.nextLine();
             term = checkInput(index);
             if (term || Integer.parseInt(index) >= paymentsList.size()) {
